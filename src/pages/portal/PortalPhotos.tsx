@@ -54,6 +54,7 @@ export default function PortalPhotos() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [photos, setPhotos] = useState<PhotoUpload[]>([]);
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -64,6 +65,21 @@ export default function PortalPhotos() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  const resolveSignedUrls = async (photoList: PhotoUpload[]) => {
+    const urls: Record<string, string> = {};
+    await Promise.all(
+      photoList.map(async (photo) => {
+        const { data } = await supabase.storage
+          .from("client-uploads")
+          .createSignedUrl(photo.file_url, 3600);
+        if (data?.signedUrl) {
+          urls[photo.id] = data.signedUrl;
+        }
+      })
+    );
+    setSignedUrls(urls);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -98,6 +114,7 @@ export default function PortalPhotos() {
         .order("created_at", { ascending: false });
 
       setPhotos((data as unknown as PhotoUpload[]) || []);
+      await resolveSignedUrls((data as unknown as PhotoUpload[]) || []);
     }
 
     fetchPhotos();
@@ -127,10 +144,8 @@ export default function PortalPhotos() {
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from("client-uploads")
-        .getPublicUrl(fileName);
+      // Store the storage path (not a public URL) for signed URL generation
+      const storagePath = fileName;
 
       // Create database record
       const { error: dbError } = await supabase
@@ -138,7 +153,7 @@ export default function PortalPhotos() {
         .insert({
           project_id: selectedProject,
           uploaded_by: user.id,
-          file_url: urlData.publicUrl,
+          file_url: storagePath,
           file_name: selectedFile.name,
           category,
           description: description || null,
@@ -157,7 +172,9 @@ export default function PortalPhotos() {
         .select(`*, projects (name)`)
         .eq("project_id", selectedProject)
         .order("created_at", { ascending: false });
-      setPhotos((data as unknown as PhotoUpload[]) || []);
+      const refreshedPhotos = (data as unknown as PhotoUpload[]) || [];
+      setPhotos(refreshedPhotos);
+      await resolveSignedUrls(refreshedPhotos);
     } catch (error) {
       console.error("Upload error:", error);
       toast.error("Failed to upload photo");
@@ -401,7 +418,7 @@ export default function PortalPhotos() {
               <Card key={photo.id} className="overflow-hidden hover-lift group">
                 <div className="relative aspect-square">
                   <img
-                    src={photo.file_url}
+                    src={signedUrls[photo.id] || ""}
                     alt={photo.file_name}
                     className="w-full h-full object-cover"
                   />
