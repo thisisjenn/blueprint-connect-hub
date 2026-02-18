@@ -121,8 +121,15 @@ export default function PortalMessages() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const MAX_MESSAGE_LENGTH = 10000;
+
   const sendMessage = async () => {
-    if (!newMessage.trim() || !selectedProject || !user) return;
+    const trimmed = newMessage.trim();
+    if (!trimmed || !selectedProject || !user) return;
+    if (trimmed.length > MAX_MESSAGE_LENGTH) {
+      toast.error(`Message must be ${MAX_MESSAGE_LENGTH.toLocaleString()} characters or less`);
+      return;
+    }
 
     setIsSending(true);
     const { error } = await supabase
@@ -130,7 +137,7 @@ export default function PortalMessages() {
       .insert({
         project_id: selectedProject,
         sender_id: user.id,
-        content: newMessage.trim(),
+        content: trimmed,
       });
 
     if (error) {
@@ -252,6 +259,7 @@ export default function PortalMessages() {
                   sendMessage();
                 }
               }}
+              maxLength={MAX_MESSAGE_LENGTH}
               className="resize-none"
               rows={2}
             />
