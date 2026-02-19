@@ -1,3 +1,6 @@
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,17 +10,85 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   User,
   Bell,
   Shield,
-  Palette,
   CreditCard,
   Users,
   Upload,
+  Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
+
+interface Profile {
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  avatar_url: string | null;
+}
 
 export default function SettingsPage() {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Form state — empty initially, filled after fetch
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+
+    async function fetchProfile() {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("full_name, email, phone, avatar_url")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+
+      if (!error && data) {
+        setProfile(data);
+        setFullName(data.full_name ?? "");
+        setEmail(data.email ?? "");
+        setPhone(data.phone ?? "");
+      }
+      setIsLoading(false);
+    }
+
+    fetchProfile();
+  }, [user]);
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    setIsSaving(true);
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ full_name: fullName, email, phone })
+      .eq("user_id", user.id);
+
+    if (error) {
+      toast.error("Failed to save profile");
+    } else {
+      toast.success("Profile saved successfully");
+    }
+    setIsSaving(false);
+  };
+
+  const getInitials = (name: string | null) => {
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
     <div className="flex flex-col h-full">
       <DashboardHeader
@@ -57,56 +128,89 @@ export default function SettingsPage() {
                 <CardTitle>Profile Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center gap-6">
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage src="" alt="Profile" />
-                    <AvatarFallback className="bg-primary text-primary-foreground text-xl">
-                      JD
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <Button variant="outline" className="gap-2">
-                      <Upload className="w-4 h-4" />
-                      Upload Photo
-                    </Button>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      JPG, GIF or PNG. Max size 2MB.
-                    </p>
+                {isLoading ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-6">
+                      <Skeleton className="h-20 w-20 rounded-full" />
+                      <Skeleton className="h-9 w-32" />
+                    </div>
+                    <Separator />
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {[...Array(4)].map((_, i) => (
+                        <div key={i} className="space-y-2">
+                          <Skeleton className="h-4 w-20" />
+                          <Skeleton className="h-10 w-full" />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-6">
+                      <Avatar className="h-20 w-20">
+                        <AvatarImage src={profile?.avatar_url ?? ""} alt="Profile" />
+                        <AvatarFallback className="bg-primary text-primary-foreground text-xl">
+                          {getInitials(profile?.full_name ?? null)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <Button variant="outline" className="gap-2">
+                          <Upload className="w-4 h-4" />
+                          Upload Photo
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          JPG, GIF or PNG. Max size 2MB.
+                        </p>
+                      </div>
+                    </div>
 
-                <Separator />
+                    <Separator />
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" defaultValue="John" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" defaultValue="Doe" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" defaultValue="john@example.com" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input id="phone" defaultValue="(555) 123-4567" />
-                  </div>
-                  <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="company">Company Name</Label>
-                    <Input id="company" defaultValue="Doe Architecture & Design" />
-                  </div>
-                  <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="address">Business Address</Label>
-                    <Input id="address" defaultValue="123 Main Street, Denver, CO 80202" />
-                  </div>
-                </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2 md:col-span-2">
+                        <Label htmlFor="fullName">Full Name</Label>
+                        <Input
+                          id="fullName"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          placeholder="Your full name"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="you@example.com"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone</Label>
+                        <Input
+                          id="phone"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          placeholder="(555) 000-0000"
+                        />
+                      </div>
+                    </div>
 
-                <div className="flex justify-end">
-                  <Button variant="accent">Save Changes</Button>
-                </div>
+                    <div className="flex justify-end">
+                      <Button variant="accent" onClick={handleSaveProfile} disabled={isSaving}>
+                        {isSaving ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          "Save Changes"
+                        )}
+                      </Button>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
