@@ -1,4 +1,4 @@
-import { Bell, Search, Plus, User } from "lucide-react";
+import { Bell, Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,6 +11,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DashboardHeaderProps {
   title: string;
@@ -18,6 +22,36 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ title, subtitle }: DashboardHeaderProps) {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const [fullName, setFullName] = useState<string>("");
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.full_name) setFullName(data.full_name);
+      });
+  }, [user]);
+
+  const displayName = fullName || user?.email?.split("@")[0] || "User";
+  const displayEmail = user?.email || "";
+  const initials = displayName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/login");
+  };
+
   return (
     <header className="flex items-center justify-between h-16 px-6 border-b border-border bg-card">
       <div>
@@ -68,9 +102,9 @@ export function DashboardHeader({ title, subtitle }: DashboardHeaderProps) {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="" alt="User" />
+                <AvatarImage src="" alt={displayName} />
                 <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                  JD
+                  {initials}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -78,16 +112,17 @@ export function DashboardHeader({ title, subtitle }: DashboardHeaderProps) {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">John Doe</p>
-                <p className="text-xs text-muted-foreground">john@example.com</p>
+                <p className="text-sm font-medium">{displayName}</p>
+                <p className="text-xs text-muted-foreground">{displayEmail}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Account Settings</DropdownMenuItem>
-            <DropdownMenuItem>Team Settings</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>Profile</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>Account Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">Log out</DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive" onClick={handleSignOut}>
+              Log out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
