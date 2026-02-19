@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+
 
 // Landing & Auth Pages
 import LandingPage from "./pages/LandingPage";
@@ -67,51 +69,53 @@ function RoleBasedRedirect() {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<RoleBasedRedirect />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignUpPage />} />
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<RoleBasedRedirect />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignUpPage />} />
 
-            {/* Contractor Dashboard (protected) */}
-            <Route element={<ProtectedRoute allowedRoles={["contractor"]} />}>
-              <Route path="/dashboard" element={<DashboardLayout />}>
-                <Route index element={<DashboardHome />} />
-                <Route path="jobs" element={<JobsPage />} />
-                <Route path="clients" element={<ClientsPage />} />
-                <Route path="documents" element={<DocumentsPage />} />
-                <Route path="messages" element={<MessagesPage />} />
-                <Route path="schedule" element={<SchedulePage />} />
-                <Route path="contracts" element={<ContractsPage />} />
-                <Route path="settings" element={<SettingsPage />} />
+              {/* Contractor Dashboard (protected) */}
+              <Route element={<ProtectedRoute allowedRoles={["contractor"]} />}>
+                <Route path="/dashboard" element={<DashboardLayout />}>
+                  <Route index element={<DashboardHome />} />
+                  <Route path="jobs" element={<JobsPage />} />
+                  <Route path="clients" element={<ClientsPage />} />
+                  <Route path="documents" element={<DocumentsPage />} />
+                  <Route path="messages" element={<MessagesPage />} />
+                  <Route path="schedule" element={<SchedulePage />} />
+                  <Route path="contracts" element={<ContractsPage />} />
+                  <Route path="settings" element={<SettingsPage />} />
+                </Route>
               </Route>
-            </Route>
 
-            {/* Client Portal (protected) */}
-            <Route element={<ProtectedRoute allowedRoles={["client"]} />}>
-              <Route path="/portal" element={<ClientPortalLayout />}>
-                <Route index element={<PortalOverview />} />
-                <Route path="documents" element={<PortalDocuments />} />
-                <Route path="checklist" element={<PortalChecklist />} />
-                <Route path="messages" element={<PortalMessages />} />
-                <Route path="invoices" element={<PortalInvoices />} />
-                <Route path="photos" element={<PortalPhotos />} />
+              {/* Client Portal (protected) */}
+              <Route element={<ProtectedRoute allowedRoles={["client"]} />}>
+                <Route path="/portal" element={<ClientPortalLayout />}>
+                  <Route index element={<PortalOverview />} />
+                  <Route path="documents" element={<PortalDocuments />} />
+                  <Route path="checklist" element={<PortalChecklist />} />
+                  <Route path="messages" element={<PortalMessages />} />
+                  <Route path="invoices" element={<PortalInvoices />} />
+                  <Route path="photos" element={<PortalPhotos />} />
+                </Route>
               </Route>
-            </Route>
 
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
