@@ -40,6 +40,12 @@ export default function SettingsPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
 
+  // Password change state
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
   useEffect(() => {
     if (!user) return;
 
@@ -66,17 +72,56 @@ export default function SettingsPage() {
     if (!user) return;
     setIsSaving(true);
 
-    const { error } = await supabase
+    // Update profile table
+    const { error: profileError } = await supabase
       .from("profiles")
       .update({ full_name: fullName, email, phone })
       .eq("user_id", user.id);
 
-    if (error) {
+    if (profileError) {
       toast.error("Failed to save profile");
+      setIsSaving(false);
+      return;
+    }
+
+    // Sync email to auth system if it changed
+    if (email !== user.email) {
+      const { error: authError } = await supabase.auth.updateUser({ email });
+      if (authError) {
+        toast.error("Profile saved, but email update failed: " + authError.message);
+        setIsSaving(false);
+        return;
+      }
+      toast.success("Profile saved. Check your new email address to confirm the change.");
     } else {
       toast.success("Profile saved successfully");
     }
+
     setIsSaving(false);
+  };
+
+  const handleChangePassword = async () => {
+    if (newPassword !== confirmPassword) {
+      toast.error("New passwords do not match.");
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+
+    setIsChangingPassword(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Password updated successfully.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    }
+    setIsChangingPassword(false);
   };
 
   const getInitials = (name: string | null) => {
@@ -283,18 +328,48 @@ export default function SettingsPage() {
                   <div className="grid gap-4 max-w-md">
                     <div className="space-y-2">
                       <Label htmlFor="currentPassword">Current Password</Label>
-                      <Input id="currentPassword" type="password" />
+                      <Input
+                        id="currentPassword"
+                        type="password"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="••••••••"
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="newPassword">New Password</Label>
-                      <Input id="newPassword" type="password" />
+                      <Input
+                        id="newPassword"
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="••••••••"
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                      <Input id="confirmPassword" type="password" />
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="••••••••"
+                      />
                     </div>
-                    <Button variant="accent" className="w-fit">
-                      Update Password
+                    <Button
+                      variant="accent"
+                      className="w-fit"
+                      onClick={handleChangePassword}
+                      disabled={isChangingPassword || !newPassword}
+                    >
+                      {isChangingPassword ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Updating...
+                        </>
+                      ) : (
+                        "Update Password"
+                      )}
                     </Button>
                   </div>
                 </div>
