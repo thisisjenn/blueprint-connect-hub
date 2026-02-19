@@ -76,27 +76,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, fullName: string, userRole: "client" | "contractor") => {
-    const { data, error } = await supabase.auth.signUp({
+    // Pass role in metadata so the DB trigger (handle_new_user) inserts it into
+    // user_roles with SECURITY DEFINER — bypassing RLS during email confirmation.
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: fullName, role: userRole },
         emailRedirectTo: window.location.origin,
       },
     });
 
-    if (error) return { error };
-
-    // Create user role after signup
-    if (data.user) {
-      const { error: roleError } = await supabase
-        .from("user_roles")
-        .insert({ user_id: data.user.id, role: userRole });
-      
-      if (roleError) return { error: roleError };
-    }
-
-    return { error: null };
+    return { error };
   };
 
   const signOut = async () => {
