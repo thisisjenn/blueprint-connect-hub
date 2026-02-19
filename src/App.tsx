@@ -11,6 +11,8 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignUpPage from "./pages/auth/SignUpPage";
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import NotFound from "./pages/NotFound";
 
 // Contractor Dashboard
@@ -81,6 +83,8 @@ const App = () => (
               <Route path="/" element={<RoleBasedRedirect />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignUpPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
 
               {/* Contractor Dashboard (protected) */}
               <Route element={<ProtectedRoute allowedRoles={["contractor"]} />}>
