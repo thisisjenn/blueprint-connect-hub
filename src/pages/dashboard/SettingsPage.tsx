@@ -21,6 +21,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useRef } from "react";
 
 interface Profile {
   full_name: string | null;
@@ -39,6 +40,10 @@ export default function SettingsPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+
+  // Avatar
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   // Password change state
   const [currentPassword, setCurrentPassword] = useState("");
@@ -124,6 +129,51 @@ export default function SettingsPage() {
     setIsChangingPassword(false);
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("File must be under 2MB.");
+      return;
+    }
+
+    if (!["image/jpeg", "image/png", "image/gif"].includes(file.type)) {
+      toast.error("Only JPG, PNG, or GIF files are allowed.");
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    const ext = file.name.split(".").pop();
+    const filePath = `${user.id}/avatar.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) {
+      toast.error("Upload failed: " + uploadError.message);
+      setIsUploadingAvatar(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(filePath);
+    const avatarUrl = urlData.publicUrl + "?t=" + Date.now();
+
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({ avatar_url: avatarUrl })
+      .eq("user_id", user.id);
+
+    if (updateError) {
+      toast.error("Failed to save avatar URL.");
+    } else {
+      setProfile((prev) => prev ? { ...prev, avatar_url: avatarUrl } : prev);
+      toast.success("Profile photo updated!");
+    }
+    setIsUploadingAvatar(false);
+  };
+
   const getInitials = (name: string | null) => {
     if (!name) return "?";
     return name
@@ -199,9 +249,25 @@ export default function SettingsPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <Button variant="outline" className="gap-2">
-                          <Upload className="w-4 h-4" />
-                          Upload Photo
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/jpeg,image/png,image/gif"
+                          className="hidden"
+                          onChange={handleAvatarUpload}
+                        />
+                        <Button
+                          variant="outline"
+                          className="gap-2"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={isUploadingAvatar}
+                        >
+                          {isUploadingAvatar ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Upload className="w-4 h-4" />
+                          )}
+                          {isUploadingAvatar ? "Uploading..." : "Upload Photo"}
                         </Button>
                         <p className="text-xs text-muted-foreground mt-2">
                           JPG, GIF or PNG. Max size 2MB.
