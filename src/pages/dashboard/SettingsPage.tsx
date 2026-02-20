@@ -64,8 +64,12 @@ export default function SettingsPage() {
       if (!error && data) {
         setProfile(data);
         setFullName(data.full_name ?? "");
-        setEmail(data.email ?? "");
+        setEmail(data.email ?? user!.email ?? "");
         setPhone(data.phone ?? "");
+      } else {
+        // No profile row exists yet — prefill from auth
+        setEmail(user!.email ?? "");
+        setFullName(user!.user_metadata?.full_name ?? "");
       }
       setIsLoading(false);
     }
@@ -77,11 +81,13 @@ export default function SettingsPage() {
     if (!user) return;
     setIsSaving(true);
 
-    // Update profile table
+    // Upsert profile table (creates row if it doesn't exist)
     const { error: profileError } = await supabase
       .from("profiles")
-      .update({ full_name: fullName, email, phone })
-      .eq("user_id", user.id);
+      .upsert(
+        { user_id: user.id, full_name: fullName, email, phone },
+        { onConflict: "user_id" }
+      );
 
     if (profileError) {
       toast.error("Failed to save profile");
