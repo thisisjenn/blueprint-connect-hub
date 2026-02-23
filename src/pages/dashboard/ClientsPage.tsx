@@ -154,6 +154,17 @@ export default function ClientsPage() {
                           <DropdownMenuItem onClick={() => { setEditClient(client); setShowAddClient(true); }}>
                             Edit Client
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {
+                            const project = (client.projects ?? []).find((p: any) => p.status === "active");
+                            if (project) {
+                              window.location.href = `/portal/projects/${project.id}`;
+                            } else {
+                              toast.info("No active project found for this client");
+                            }
+                          }}>
+                            <Mail className="w-4 h-4 mr-2" />
+                            Message Client
+                          </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-destructive" onClick={() => deleteClient.mutate(client.id)}>
                             Archive
