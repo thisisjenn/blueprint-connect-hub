@@ -39,7 +39,7 @@ export function AddJobDialog({ open, onOpenChange }: AddJobDialogProps) {
   const { data: clients } = useQuery({
     queryKey: ["clients"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("clients").select("id, name").order("name");
+      const { data, error } = await supabase.from("clients").select("id, name, user_id").order("name");
       if (error) throw error;
       return data;
     },
@@ -57,12 +57,13 @@ export function AddJobDialog({ open, onOpenChange }: AddJobDialogProps) {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      // Only send client_id if it's a valid UUID
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      const validClientId = clientId && uuidRegex.test(clientId) ? clientId : null;
+      // Find the selected client's user_id to use as project client_id
+      // This ensures RLS is_client_for_project(client_id = auth.uid()) works correctly
+      const selectedClient = clients?.find((c) => c.id === clientId);
+      const projectClientId = selectedClient?.user_id || null;
       const { error } = await supabase.from("projects").insert({
         name,
-        client_id: validClientId,
+        client_id: projectClientId,
         address,
         status,
         description,
