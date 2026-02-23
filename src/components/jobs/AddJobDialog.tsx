@@ -44,7 +44,7 @@ export function AddJobDialog({ open, onOpenChange, preselectedClientId }: AddJob
   const { data: clients } = useQuery({
     queryKey: ["clients"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("clients").select("id, name, user_id").order("name");
+      const { data, error } = await supabase.from("clients").select("id, name, email").order("name");
       if (error) throw error;
       return data;
     },
@@ -62,21 +62,33 @@ export function AddJobDialog({ open, onOpenChange, preselectedClientId }: AddJob
 
   const mutation = useMutation({
     mutationFn: async () => {
-      // Resolve the client's auth user_id for the project's client_id (needed for RLS)
-      let resolvedClientId: string | null = null;
+      let authUserId: string | null = null;
+      let clientRecordId: string | null = null;
+
       if (clientId) {
+        clientRecordId = clientId;
+        // Look up the client's email, then find their auth user_id via profiles
         const selected = clients?.find((c) => c.id === clientId);
-        resolvedClientId = selected?.user_id ?? null;
+        if (selected?.email) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("user_id")
+            .eq("email", selected.email)
+            .maybeSingle();
+          authUserId = profile?.user_id ?? null;
+        }
       }
+
       const { error } = await supabase.from("projects").insert({
         name,
-        client_id: resolvedClientId,
+        client_id: authUserId,
+        client_record_id: clientRecordId,
         address,
         status,
         description,
         start_date: startDate || null,
         end_date: endDate || null,
-      });
+      } as any);
       if (error) throw error;
     },
     onSuccess: () => {

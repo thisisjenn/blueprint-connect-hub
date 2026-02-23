@@ -48,13 +48,12 @@ export default function ClientsPage() {
     queryFn: async () => {
       const [clientsRes, projectsRes] = await Promise.all([
         supabase.from("clients").select("*").order("name"),
-        supabase.from("projects").select("id, status, client_id"),
+        supabase.from("projects").select("id, status, client_record_id") as any,
       ]);
       if (clientsRes.error) throw clientsRes.error;
-      // Match projects to clients: project.client_id stores the client's auth user_id
       return (clientsRes.data ?? []).map((client: any) => ({
         ...client,
-        projects: (projectsRes.data ?? []).filter((p: any) => p.client_id === client.user_id),
+        projects: (projectsRes.data ?? []).filter((p: any) => p.client_record_id === client.id),
       }));
     },
   });

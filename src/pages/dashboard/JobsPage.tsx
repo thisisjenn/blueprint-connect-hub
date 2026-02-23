@@ -71,9 +71,8 @@ export default function JobsPage() {
       ]);
       if (projectsRes.error) throw projectsRes.error;
 
-      // Map by user_id since projects.client_id stores the client's auth user_id
       const clientMap = new Map(
-        (clientsRes.data ?? []).map((c: any) => [c.user_id, c.name])
+        (clientsRes.data ?? []).map((c: any) => [c.id, c.name])
       );
 
       return (projectsRes.data ?? []).map((p: any): JobWithMeta => {
@@ -89,7 +88,7 @@ export default function JobsPage() {
           start_date: p.start_date,
           description: p.description,
           client_id: p.client_id,
-          clientName: p.client_id ? clientMap.get(p.client_id) ?? null : null,
+          clientName: p.client_record_id ? clientMap.get(p.client_record_id) ?? null : null,
           completedTasks: completed,
           totalTasks: total,
           progress: total > 0 ? Math.round((completed / total) * 100) : 0,
