@@ -179,7 +179,8 @@ export default function PortalOverview() {
         ) : (
           <div className="grid md:grid-cols-2 gap-4">
             {projects.map((project) => (
-              <Card key={project.id} className="hover-lift">
+              <Link key={project.id} to={`/portal/projects/${project.id}`}>
+              <Card className="hover-lift cursor-pointer">
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between">
                     <div>
@@ -211,6 +212,7 @@ export default function PortalOverview() {
                   )}
                 </CardContent>
               </Card>
+              </Link>
             ))}
           </div>
         )}
