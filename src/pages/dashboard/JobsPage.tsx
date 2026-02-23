@@ -62,13 +62,20 @@ export default function JobsPage() {
   const { data: jobs = [], isLoading: jobsLoading } = useQuery({
     queryKey: ["jobs"],
     queryFn: async () => {
-      const { data: projects, error } = await supabase
-        .from("projects")
-        .select("*, clients(name), project_tasks(id, status)")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
+      const [projectsRes, clientsRes] = await Promise.all([
+        supabase
+          .from("projects")
+          .select("*, project_tasks(id, status)")
+          .order("created_at", { ascending: false }),
+        supabase.from("clients").select("id, name"),
+      ]);
+      if (projectsRes.error) throw projectsRes.error;
 
-      return (projects ?? []).map((p: any): JobWithMeta => {
+      const clientMap = new Map(
+        (clientsRes.data ?? []).map((c: any) => [c.id, c.name])
+      );
+
+      return (projectsRes.data ?? []).map((p: any): JobWithMeta => {
         const tasks = p.project_tasks ?? [];
         const completed = tasks.filter((t: any) => t.status === "completed").length;
         const total = tasks.length;
@@ -81,7 +88,7 @@ export default function JobsPage() {
           start_date: p.start_date,
           description: p.description,
           client_id: p.client_id,
-          clientName: p.clients?.name ?? null,
+          clientName: p.client_id ? clientMap.get(p.client_id) ?? null : null,
           completedTasks: completed,
           totalTasks: total,
           progress: total > 0 ? Math.round((completed / total) * 100) : 0,
