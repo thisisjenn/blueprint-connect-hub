@@ -168,11 +168,14 @@ export default function ClientsPage() {
                             Add Project
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => {
-                            const project = (client.projects ?? []).find((p: any) => p.status === "active");
+                            const projects = client.projects ?? [];
+                            const project = projects.find((p: any) => p.status === "active") || projects[0];
                             if (project) {
                               window.location.href = `/dashboard/messages?project=${project.id}`;
                             } else {
-                              toast.info("No active project found for this client. Add a project first.");
+                              setJobClientId(client.id);
+                              setShowAddJob(true);
+                              toast.info("Create a project for this client first to start messaging.");
                             }
                           }}>
                             <Mail className="w-4 h-4 mr-2" />
