@@ -70,11 +70,24 @@ export default function MessagesPage() {
       // Get projects the user can access
       const { data: projects, error } = await supabase
         .from("projects")
-        .select("id, name, client_id, clients(name)")
+        .select("id, name, client_id, client_record_id")
         .order("updated_at", { ascending: false });
 
       if (error) throw error;
       if (!projects?.length) return [];
+
+      // Fetch client names from the clients table
+      const clientRecordIds = projects.map((p) => p.client_record_id).filter(Boolean);
+      let clientMap: Record<string, string> = {};
+      if (clientRecordIds.length > 0) {
+        const { data: clients } = await supabase
+          .from("clients")
+          .select("id, name")
+          .in("id", clientRecordIds);
+        if (clients) {
+          clientMap = Object.fromEntries(clients.map((c) => [c.id, c.name]));
+        }
+      }
 
       // For each project, get last message and unread count
       const convos: Conversation[] = [];
@@ -94,11 +107,10 @@ export default function MessagesPage() {
           .eq("is_read", false)
           .neq("sender_id", user.id);
 
-        const clientData = proj.clients as { name: string } | null;
         convos.push({
           project_id: proj.id,
           project_name: proj.name,
-          other_party_name: clientData?.name ?? "No client",
+          other_party_name: proj.client_record_id ? (clientMap[proj.client_record_id] ?? "No client") : "No client",
           last_message: lastMsg?.content ?? null,
           last_message_time: lastMsg?.created_at ?? null,
           unread_count: unreadCount ?? 0,

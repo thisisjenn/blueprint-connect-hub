@@ -63,14 +63,35 @@ export default function PortalMessages() {
     async function fetchMessages() {
       const { data } = await supabase
         .from("project_messages")
-        .select(`
-          *,
-          profiles:sender_id (full_name, email)
-        `)
+        .select("*")
         .eq("project_id", selectedProject)
         .order("created_at", { ascending: true });
 
-      setMessages((data as unknown as Message[]) || []);
+      const rawMessages = data || [];
+
+      // Fetch sender profiles separately since there's no FK
+      const senderIds = [...new Set(rawMessages.map((m) => m.sender_id).filter(Boolean))];
+      let profileMap: Record<string, { full_name: string | null; email: string | null }> = {};
+      if (senderIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("user_id, full_name, email")
+          .in("user_id", senderIds);
+        if (profiles) {
+          profileMap = Object.fromEntries(profiles.map((p) => [p.user_id, { full_name: p.full_name, email: p.email }]));
+        }
+      }
+
+      const messagesWithProfiles: Message[] = rawMessages.map((m) => ({
+        id: m.id,
+        content: m.content,
+        sender_id: m.sender_id,
+        created_at: m.created_at ?? "",
+        is_read: m.is_read ?? false,
+        profiles: profileMap[m.sender_id ?? ""] ?? null,
+      }));
+
+      setMessages(messagesWithProfiles);
 
       // Mark messages as read
       await supabase
@@ -95,19 +116,28 @@ export default function PortalMessages() {
           filter: `project_id=eq.${selectedProject}`,
         },
         async (payload) => {
-          // Fetch the full message with profile
-          const { data } = await supabase
-            .from("project_messages")
-            .select(`
-              *,
-              profiles:sender_id (full_name, email)
-            `)
-            .eq("id", payload.new.id)
-            .single();
-
-          if (data) {
-            setMessages((prev) => [...prev, data as unknown as Message]);
+          const newMsg = payload.new as any;
+          // Fetch profile for the sender
+          let profiles = null;
+          if (newMsg.sender_id) {
+            const { data: profileData } = await supabase
+              .from("profiles")
+              .select("full_name, email")
+              .eq("user_id", newMsg.sender_id)
+              .maybeSingle();
+            profiles = profileData;
           }
+
+          const message: Message = {
+            id: newMsg.id,
+            content: newMsg.content,
+            sender_id: newMsg.sender_id,
+            created_at: newMsg.created_at ?? "",
+            is_read: newMsg.is_read ?? false,
+            profiles,
+          };
+
+          setMessages((prev) => [...prev, message]);
         }
       )
       .subscribe();
