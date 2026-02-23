@@ -67,13 +67,13 @@ export default function JobsPage() {
           .from("projects")
           .select("*, project_tasks(id, status)")
           .order("created_at", { ascending: false }),
-        supabase.from("clients").select("id, name, user_id"),
+        supabase.from("clients").select("id, name"),
       ]);
       if (projectsRes.error) throw projectsRes.error;
 
-      // Map by user_id since projects.client_id stores the client's auth user_id
+      // Map by client id since projects.client_id stores the client's table id
       const clientMap = new Map(
-        (clientsRes.data ?? []).map((c: any) => [c.user_id, c.name])
+        (clientsRes.data ?? []).map((c: any) => [c.id, c.name])
       );
 
       return (projectsRes.data ?? []).map((p: any): JobWithMeta => {
