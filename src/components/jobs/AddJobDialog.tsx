@@ -79,16 +79,19 @@ export function AddJobDialog({ open, onOpenChange, preselectedClientId }: AddJob
         }
       }
 
-      const { error } = await supabase.from("projects").insert({
+      const insertData: Record<string, any> = {
         name,
         client_id: authUserId,
-        client_record_id: clientRecordId,
         address,
         status,
         description,
         start_date: startDate || null,
         end_date: endDate || null,
-      });
+      };
+      if (clientRecordId) {
+        insertData.client_record_id = clientRecordId;
+      }
+      const { error } = await supabase.from("projects").insert(insertData as any);
       if (error) throw error;
     },
     onSuccess: () => {

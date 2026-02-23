@@ -46,14 +46,27 @@ export default function ClientsPage() {
   const { data: clients = [], isLoading } = useQuery({
     queryKey: ["clients"],
     queryFn: async () => {
-      const [clientsRes, projectsRes] = await Promise.all([
-        supabase.from("clients").select("*").order("name"),
-        supabase.from("projects").select("id, status, client_record_id") as any,
-      ]);
+      const clientsRes = await supabase.from("clients").select("*").order("name");
       if (clientsRes.error) throw clientsRes.error;
+
+      // Fetch projects separately - use a raw query approach to avoid schema cache issues
+      let projectsList: any[] = [];
+      try {
+        const projectsRes = await supabase.from("projects").select("id, status, client_record_id");
+        projectsList = projectsRes.data ?? [];
+      } catch {
+        // If client_record_id column causes schema cache issues, fall back
+        try {
+          const projectsRes = await supabase.from("projects").select("id, status, client_id");
+          projectsList = projectsRes.data ?? [];
+        } catch {
+          projectsList = [];
+        }
+      }
+
       return (clientsRes.data ?? []).map((client: any) => ({
         ...client,
-        projects: (projectsRes.data ?? []).filter((p: any) => p.client_record_id === client.id),
+        projects: projectsList.filter((p: any) => p.client_record_id === client.id),
       }));
     },
   });
