@@ -1,96 +1,97 @@
 
-# Complete Authentication Flow — What Exists vs. What Needs Building
 
-## What Already Works Well
+## Plan: Make Jobs and Clients Pages Dynamic with Real Data
 
-The core authentication infrastructure is already solid:
+### Overview
+Replace all hardcoded/mock data in the Jobs and Clients pages with live data from the database. Add working "Add Job" and "Add Client" forms, plus functional task management, status updates, and delete actions.
 
-- Users sign up via `/signup`, choosing a role (Homeowner or Contractor)
-- The role and full name are passed as metadata to the auth system
-- A database trigger (`handle_new_user`) fires on signup and automatically:
-  - Creates a row in `public.profiles` (stores email, full_name, user_id)
-  - Creates a row in `public.user_roles` (stores the chosen role)
-- On login, the app reads the role from `user_roles` and redirects the user to either `/dashboard` (contractor) or `/portal` (client)
-- All tables have Row-Level Security (RLS) enabled, using security-definer functions to prevent privilege escalation
+### What Changes
 
-## What Is Missing or Broken
+**1. New `clients` database table**
 
-### 1. Forgot Password Flow (does not exist)
-There is no way for users to reset their password if they forget it. The login page has no "Forgot password?" link, and there is no `/reset-password` page.
+Currently there's no dedicated table for contractor-managed clients. The existing `projects.client_id` references auth users, but contractors need to track clients who may not have app accounts. A new `clients` table will store client contact info managed by the contractor.
 
-### 2. Password Update in Settings Is Not Wired Up
-The Security tab in Settings (`SettingsPage.tsx`) has a "Change Password" form with three inputs, but clicking "Update Password" does nothing — there is no actual logic connected to it.
+Columns: `id`, `name`, `email`, `phone`, `address`, `type` (homeowner/contractor/business), `user_id` (the contractor who owns the record), `created_at`, `updated_at`
 
-### 3. Email Update in Settings Only Updates the Profile Table
-The Profile tab saves email changes only to the `profiles` table (display data), but does NOT update the user's actual login email in the auth system. This means if a user changes their email in settings, they still log in with the old email.
+RLS policies will restrict access so only the contractor who created a client can view/manage them.
 
-### 4. No "Forgot Password?" Link on Login Page
-The login form has no link to trigger a password reset.
+The `projects.client_id` column type will remain UUID but will now optionally reference the new `clients` table via a foreign key.
 
----
+**2. Database migration**
+- Create `clients` table with RLS policies (contractors can CRUD their own clients)
+- Add a foreign key from `projects.client_id` to `clients.id`
+- Add a `description` column to `project_tasks` if missing (it already exists)
 
-## Implementation Plan
+**3. Clients Page (`ClientsPage.tsx`) - Dynamic**
+- Remove all hardcoded client data
+- Fetch clients from `clients` table using React Query
+- Add a dialog/modal for "Add Client" with form fields: name, email, phone, address, type
+- Wire up "Edit Client" and "Archive" actions in the dropdown menu
+- Compute active/total jobs counts by joining with `projects` table
+- Show loading skeletons while data loads
+- Show empty state when no clients exist
 
-### Step 1 — Add "Forgot Password" link to the Login page
-Add a "Forgot password?" link below the password field on `LoginPage.tsx` that navigates to a new `/forgot-password` route.
+**4. Jobs Page (`JobsPage.tsx`) - Dynamic**
+- Remove all hardcoded job and task data
+- Fetch projects from `projects` table (joined with `clients` for client name)
+- Fetch tasks from `project_tasks` for the selected project
+- Add a dialog/modal for "New Job" with fields: name, client (dropdown from clients table), address, status, start date, end date, description
+- Wire up "Add Task" button to create tasks in `project_tasks`
+- Make task checkboxes functional (toggle task status/completed_at)
+- Wire up "Delete" action to delete a project
+- Compute progress from completed vs total tasks
+- Show loading states and empty states
 
-### Step 2 — Create `ForgotPasswordPage.tsx`
-A simple page at `/forgot-password` with one email input field. On submit, it calls:
-```
-supabase.auth.resetPasswordForEmail(email, {
-  redirectTo: window.location.origin + '/reset-password'
-})
-```
-This sends a password reset email to the user with a secure link.
+**5. New shared components**
+- `AddClientDialog.tsx` - Form dialog for creating/editing clients
+- `AddJobDialog.tsx` - Form dialog for creating/editing jobs (with client dropdown)
+- `AddTaskDialog.tsx` - Simple dialog for adding a task to a project
 
-### Step 3 — Create `ResetPasswordPage.tsx`
-A page at `/reset-password` that:
-- Detects the `type=recovery` token in the URL hash when the user arrives from the email link
-- Shows a form with "New Password" and "Confirm Password" fields
-- Calls `supabase.auth.updateUser({ password: newPassword })` on submit
-- Redirects to `/login` after a successful reset
+### Technical Details
 
-### Step 4 — Wire up "Change Password" in Settings
-Update the Security tab in `SettingsPage.tsx` to actually call `supabase.auth.updateUser({ password: newPassword })` when the user clicks "Update Password". Add proper validation to confirm both passwords match before submitting.
+**Database Migration SQL:**
+```sql
+CREATE TABLE public.clients (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  name TEXT NOT NULL,
+  email TEXT,
+  phone TEXT,
+  address TEXT,
+  type TEXT NOT NULL DEFAULT 'homeowner',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
 
-### Step 5 — Wire up Email Change in Settings
-Update the Profile tab save logic in `SettingsPage.tsx` to also call `supabase.auth.updateUser({ email: newEmail })` whenever the email field has changed. This keeps the login email in sync with the profile display email. The user will receive a confirmation email to their new address before the change takes effect.
+ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
 
-### Step 6 — Register the new public routes in `App.tsx`
-Add `/forgot-password` and `/reset-password` as public routes (no login required — the user needs these to recover access).
+-- Contractors can manage their own clients
+CREATE POLICY "Contractors can manage own clients"
+  ON public.clients FOR ALL USING (auth.uid() = user_id);
 
----
+-- Add FK from projects to clients
+ALTER TABLE public.projects
+  ADD CONSTRAINT projects_client_id_fkey
+  FOREIGN KEY (client_id) REFERENCES public.clients(id)
+  ON DELETE SET NULL;
 
-## How the Full Flow Works After This Plan
-
-```text
-SIGN UP
-  User fills name / email / password / role → auth system creates account
-  → trigger fires → profile row created → role row created
-  → user receives verification email → clicks link → can now log in
-
-LOGIN
-  User enters email + password → auth system validates
-  → app reads role from user_roles → redirects to /dashboard or /portal
-
-FORGOT PASSWORD
-  User clicks "Forgot password?" on login page → /forgot-password
-  → enters email → reset email sent → user clicks link in email
-  → lands on /reset-password → enters new password → saved → redirect to login
-
-CHANGE PASSWORD (while logged in)
-  User goes to Settings → Security → enters new password → saved to auth system
-
-CHANGE EMAIL (while logged in)
-  User goes to Settings → Profile → changes email → saved to both profile table
-  AND auth system → confirmation email sent to new address
+-- Trigger for updated_at
+CREATE TRIGGER update_clients_updated_at
+  BEFORE UPDATE ON public.clients
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 ```
 
-## Files to Create
-- `src/pages/auth/ForgotPasswordPage.tsx`
-- `src/pages/auth/ResetPasswordPage.tsx`
+**Data fetching pattern** (using React Query + Supabase client):
+- `useQuery` for fetching lists with proper loading/error states
+- `useMutation` with `queryClient.invalidateQueries` for create/update/delete
+- All mutations will use `toast` for success/error feedback
 
-## Files to Modify
-- `src/pages/auth/LoginPage.tsx` — add "Forgot password?" link
-- `src/pages/dashboard/SettingsPage.tsx` — wire up password change + email sync
-- `src/App.tsx` — register `/forgot-password` and `/reset-password` routes
+**Files to create:**
+- `src/components/jobs/AddJobDialog.tsx`
+- `src/components/jobs/AddTaskDialog.tsx`
+- `src/components/clients/AddClientDialog.tsx`
+
+**Files to modify:**
+- `src/pages/dashboard/JobsPage.tsx` - Complete rewrite to use dynamic data
+- `src/pages/dashboard/ClientsPage.tsx` - Complete rewrite to use dynamic data
+
