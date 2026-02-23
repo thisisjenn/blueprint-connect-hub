@@ -345,6 +345,7 @@ export type Database = {
         Row: {
           address: string | null
           client_id: string | null
+          client_record_id: string | null
           created_at: string | null
           description: string | null
           end_date: string | null
@@ -357,6 +358,7 @@ export type Database = {
         Insert: {
           address?: string | null
           client_id?: string | null
+          client_record_id?: string | null
           created_at?: string | null
           description?: string | null
           end_date?: string | null
@@ -369,6 +371,7 @@ export type Database = {
         Update: {
           address?: string | null
           client_id?: string | null
+          client_record_id?: string | null
           created_at?: string | null
           description?: string | null
           end_date?: string | null
@@ -380,8 +383,8 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "projects_client_id_fkey"
-            columns: ["client_id"]
+            foreignKeyName: "projects_client_record_id_fkey"
+            columns: ["client_record_id"]
             isOneToOne: false
             referencedRelation: "clients"
             referencedColumns: ["id"]
