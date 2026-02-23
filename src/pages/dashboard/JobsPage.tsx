@@ -67,13 +67,25 @@ export default function JobsPage() {
           .from("projects")
           .select("*, project_tasks(id, status)")
           .order("created_at", { ascending: false }),
-        supabase.from("clients").select("id, name"),
+        supabase.from("clients").select("id, name, email"),
       ]);
       if (projectsRes.error) throw projectsRes.error;
 
-      const clientMap = new Map(
-        (clientsRes.data ?? []).map((c: any) => [c.id, c.name])
+      // Build a lookup: auth user_id -> client name via profiles + clients
+      const profilesRes = await supabase.from("profiles").select("user_id, email");
+      const profileMap = new Map(
+        (profilesRes.data ?? []).map((p: any) => [p.user_id, p.email])
       );
+      const clientByEmail = new Map(
+        (clientsRes.data ?? []).map((c: any) => [c.email, c.name])
+      );
+
+      const getClientName = (clientId: string | null) => {
+        if (!clientId) return null;
+        const email = profileMap.get(clientId);
+        if (!email) return null;
+        return clientByEmail.get(email) ?? null;
+      };
 
       return (projectsRes.data ?? []).map((p: any): JobWithMeta => {
         const tasks = p.project_tasks ?? [];
@@ -88,7 +100,7 @@ export default function JobsPage() {
           start_date: p.start_date,
           description: p.description,
           client_id: p.client_id,
-          clientName: p.client_record_id ? clientMap.get(p.client_record_id) ?? null : null,
+          clientName: getClientName(p.client_id),
           completedTasks: completed,
           totalTasks: total,
           progress: total > 0 ? Math.round((completed / total) * 100) : 0,
