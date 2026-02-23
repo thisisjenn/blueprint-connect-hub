@@ -51,10 +51,10 @@ export default function ClientsPage() {
         supabase.from("projects").select("id, status, client_id"),
       ]);
       if (clientsRes.error) throw clientsRes.error;
-      // Map projects to clients by matching project.client_id to client.user_id
+      // Map projects to clients by matching project.client_id to client.id
       return (clientsRes.data ?? []).map((client: any) => ({
         ...client,
-        projects: (projectsRes.data ?? []).filter((p: any) => p.client_id === client.user_id),
+        projects: (projectsRes.data ?? []).filter((p: any) => p.client_id === client.id),
       }));
     },
   });
@@ -171,9 +171,9 @@ export default function ClientsPage() {
                           <DropdownMenuItem onClick={() => {
                             const project = (client.projects ?? []).find((p: any) => p.status === "active");
                             if (project) {
-                              window.location.href = `/portal/projects/${project.id}`;
+                              window.location.href = `/dashboard/messages?project=${project.id}`;
                             } else {
-                              toast.info("No active project found for this client");
+                              toast.info("No active project found for this client. Add a project first.");
                             }
                           }}>
                             <Mail className="w-4 h-4 mr-2" />
