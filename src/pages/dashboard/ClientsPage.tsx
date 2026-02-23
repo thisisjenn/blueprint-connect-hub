@@ -30,6 +30,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AddClientDialog } from "@/components/clients/AddClientDialog";
+import { AddJobDialog } from "@/components/jobs/AddJobDialog";
 
 type ClientType = "all" | "homeowner" | "contractor" | "business";
 
@@ -39,6 +40,8 @@ export default function ClientsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showAddClient, setShowAddClient] = useState(false);
   const [editClient, setEditClient] = useState<any>(null);
+  const [showAddJob, setShowAddJob] = useState(false);
+  const [jobClientId, setJobClientId] = useState<string | undefined>(undefined);
 
   const { data: clients = [], isLoading } = useQuery({
     queryKey: ["clients"],
@@ -159,6 +162,13 @@ export default function ClientsPage() {
                             Edit Client
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => {
+                            setJobClientId(client.id);
+                            setShowAddJob(true);
+                          }}>
+                            <Briefcase className="w-4 h-4 mr-2" />
+                            Add Project
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {
                             const project = (client.projects ?? []).find((p: any) => p.status === "active");
                             if (project) {
                               window.location.href = `/portal/projects/${project.id}`;
@@ -221,6 +231,12 @@ export default function ClientsPage() {
         open={showAddClient}
         onOpenChange={(open) => { setShowAddClient(open); if (!open) setEditClient(null); }}
         editClient={editClient}
+      />
+
+      <AddJobDialog
+        open={showAddJob}
+        onOpenChange={(open) => { setShowAddJob(open); if (!open) setJobClientId(undefined); }}
+        preselectedClientId={jobClientId}
       />
     </div>
   );
