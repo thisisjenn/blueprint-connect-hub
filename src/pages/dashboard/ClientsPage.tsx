@@ -49,25 +49,29 @@ export default function ClientsPage() {
       const clientsRes = await supabase.from("clients").select("*").order("name");
       if (clientsRes.error) throw clientsRes.error;
 
-      // Fetch projects separately - use a raw query approach to avoid schema cache issues
-      let projectsList: any[] = [];
-      try {
-        const projectsRes = await supabase.from("projects").select("id, status, client_record_id");
-        projectsList = projectsRes.data ?? [];
-      } catch {
-        // If client_record_id column causes schema cache issues, fall back
-        try {
-          const projectsRes = await supabase.from("projects").select("id, status, client_id");
-          projectsList = projectsRes.data ?? [];
-        } catch {
-          projectsList = [];
-        }
-      }
+      // Fetch projects and profiles for matching
+      const [projectsRes, profilesRes] = await Promise.all([
+        supabase.from("projects").select("id, status, client_id, client_record_id"),
+        supabase.from("profiles").select("user_id, email"),
+      ]);
+      const projectsList = projectsRes.data ?? [];
+      const profilesList = profilesRes.data ?? [];
 
-      return (clientsRes.data ?? []).map((client: any) => ({
-        ...client,
-        projects: projectsList.filter((p: any) => p.client_record_id === client.id),
-      }));
+      // Build email → auth user_id map
+      const emailToUserId: Record<string, string> = {};
+      profilesList.forEach((p: any) => {
+        if (p.email) emailToUserId[p.email.toLowerCase()] = p.user_id;
+      });
+
+      return (clientsRes.data ?? []).map((client: any) => {
+        const authUserId = client.email ? emailToUserId[client.email.toLowerCase()] : null;
+        return {
+          ...client,
+          projects: projectsList.filter((p: any) =>
+            p.client_record_id === client.id || (authUserId && p.client_id === authUserId)
+          ),
+        };
+      });
     },
   });
 
