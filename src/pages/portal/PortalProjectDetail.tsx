@@ -87,13 +87,31 @@ export default function PortalProjectDetail() {
         supabase.from("projects").select("*").eq("id", projectId).eq("client_id", user.id).single(),
         supabase.from("client_checklist_items").select("*").eq("project_id", projectId).order("is_completed").order("due_date", { ascending: true }),
         supabase.from("project_files").select("*").eq("project_id", projectId).eq("is_shared_with_client", true).order("created_at", { ascending: false }),
-        supabase.from("project_messages").select("*, profiles:sender_id (full_name, email)").eq("project_id", projectId).order("created_at", { ascending: true }),
+        supabase.from("project_messages").select("*").eq("project_id", projectId).order("created_at", { ascending: true }),
       ]);
 
       setProject(projectRes.data as Project | null);
       setChecklist((checklistRes.data as unknown as ChecklistItem[]) || []);
       setFiles((filesRes.data as unknown as ProjectFile[]) || []);
-      setMessages((messagesRes.data as unknown as Message[]) || []);
+
+      // Fetch profiles separately since there's no FK relationship
+      const rawMessages = (messagesRes.data as any[]) || [];
+      const senderIds = [...new Set(rawMessages.map((m) => m.sender_id).filter(Boolean))];
+      let profilesMap: Record<string, { full_name: string | null; email: string | null }> = {};
+      if (senderIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("user_id, full_name, email")
+          .in("user_id", senderIds);
+        if (profiles) {
+          profiles.forEach((p: any) => { profilesMap[p.user_id] = { full_name: p.full_name, email: p.email }; });
+        }
+      }
+      const messagesWithProfiles = rawMessages.map((m) => ({
+        ...m,
+        profiles: profilesMap[m.sender_id] || null,
+      }));
+      setMessages(messagesWithProfiles as Message[]);
       setIsLoading(false);
 
       // Mark messages as read
@@ -120,12 +138,17 @@ export default function PortalProjectDetail() {
         table: "project_messages",
         filter: `project_id=eq.${projectId}`,
       }, async (payload) => {
-        const { data } = await supabase
-          .from("project_messages")
-          .select("*, profiles:sender_id (full_name, email)")
-          .eq("id", payload.new.id)
-          .single();
-        if (data) setMessages((prev) => [...prev, data as unknown as Message]);
+        const newMsg = payload.new as any;
+        let profiles = null;
+        if (newMsg.sender_id) {
+          const { data } = await supabase
+            .from("profiles")
+            .select("user_id, full_name, email")
+            .eq("user_id", newMsg.sender_id)
+            .maybeSingle();
+          if (data) profiles = { full_name: data.full_name, email: data.email };
+        }
+        setMessages((prev) => [...prev, { ...newMsg, profiles } as Message]);
       })
       .subscribe();
 
