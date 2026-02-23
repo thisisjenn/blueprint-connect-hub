@@ -82,13 +82,12 @@ export function AddJobDialog({ open, onOpenChange, preselectedClientId }: AddJob
       const { error } = await supabase.from("projects").insert({
         name,
         client_id: authUserId,
-        client_record_id: clientRecordId,
         address,
         status,
         description,
         start_date: startDate || null,
         end_date: endDate || null,
-      } as any);
+      });
       if (error) throw error;
     },
     onSuccess: () => {
