@@ -43,12 +43,16 @@ export default function ClientsPage() {
   const { data: clients = [], isLoading } = useQuery({
     queryKey: ["clients"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("clients")
-        .select("*, projects(id, status)")
-        .order("name");
-      if (error) throw error;
-      return data;
+      const [clientsRes, projectsRes] = await Promise.all([
+        supabase.from("clients").select("*").order("name"),
+        supabase.from("projects").select("id, status, client_id"),
+      ]);
+      if (clientsRes.error) throw clientsRes.error;
+      // Map projects to clients by matching project.client_id to client.user_id
+      return (clientsRes.data ?? []).map((client: any) => ({
+        ...client,
+        projects: (projectsRes.data ?? []).filter((p: any) => p.client_id === client.user_id),
+      }));
     },
   });
 
