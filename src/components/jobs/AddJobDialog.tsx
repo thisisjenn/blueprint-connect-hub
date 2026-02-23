@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -24,17 +24,22 @@ import { toast } from "sonner";
 interface AddJobDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  preselectedClientId?: string;
 }
 
-export function AddJobDialog({ open, onOpenChange }: AddJobDialogProps) {
+export function AddJobDialog({ open, onOpenChange, preselectedClientId }: AddJobDialogProps) {
   const queryClient = useQueryClient();
   const [name, setName] = useState("");
-  const [clientId, setClientId] = useState("");
+  const [clientId, setClientId] = useState(preselectedClientId ?? "");
   const [address, setAddress] = useState("");
   const [status, setStatus] = useState("active");
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  useEffect(() => {
+    if (preselectedClientId) setClientId(preselectedClientId);
+  }, [preselectedClientId]);
 
   const { data: clients } = useQuery({
     queryKey: ["clients"],
@@ -74,7 +79,7 @@ export function AddJobDialog({ open, onOpenChange }: AddJobDialogProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
-      toast.success("Job created");
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
       resetForm();
       onOpenChange(false);
     },
