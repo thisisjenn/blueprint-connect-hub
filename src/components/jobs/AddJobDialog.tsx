@@ -57,9 +57,12 @@ export function AddJobDialog({ open, onOpenChange }: AddJobDialogProps) {
 
   const mutation = useMutation({
     mutationFn: async () => {
+      // Only send client_id if it's a valid UUID
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const validClientId = clientId && uuidRegex.test(clientId) ? clientId : null;
       const { error } = await supabase.from("projects").insert({
         name,
-        client_id: clientId || null,
+        client_id: validClientId,
         address,
         status,
         description,
