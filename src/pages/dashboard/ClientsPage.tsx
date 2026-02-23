@@ -51,10 +51,10 @@ export default function ClientsPage() {
         supabase.from("projects").select("id, status, client_id"),
       ]);
       if (clientsRes.error) throw clientsRes.error;
-      // Map projects to clients by matching project.client_id to client.id
+      // Match projects to clients: project.client_id stores the client's auth user_id
       return (clientsRes.data ?? []).map((client: any) => ({
         ...client,
-        projects: (projectsRes.data ?? []).filter((p: any) => p.client_id === client.id),
+        projects: (projectsRes.data ?? []).filter((p: any) => p.client_id === client.user_id),
       }));
     },
   });

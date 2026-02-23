@@ -44,7 +44,7 @@ export function AddJobDialog({ open, onOpenChange, preselectedClientId }: AddJob
   const { data: clients } = useQuery({
     queryKey: ["clients"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("clients").select("id, name").order("name");
+      const { data, error } = await supabase.from("clients").select("id, name, user_id").order("name");
       if (error) throw error;
       return data;
     },
@@ -62,9 +62,15 @@ export function AddJobDialog({ open, onOpenChange, preselectedClientId }: AddJob
 
   const mutation = useMutation({
     mutationFn: async () => {
+      // Resolve the client's auth user_id for the project's client_id (needed for RLS)
+      let resolvedClientId: string | null = null;
+      if (clientId) {
+        const selected = clients?.find((c) => c.id === clientId);
+        resolvedClientId = selected?.user_id ?? null;
+      }
       const { error } = await supabase.from("projects").insert({
         name,
-        client_id: clientId || null,
+        client_id: resolvedClientId,
         address,
         status,
         description,
