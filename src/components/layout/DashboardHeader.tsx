@@ -15,6 +15,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { AddJobDialog } from "@/components/jobs/AddJobDialog";
+import { AddClientDialog } from "@/components/clients/AddClientDialog";
+import { GlobalAddTaskDialog } from "@/components/jobs/GlobalAddTaskDialog";
+import { UploadDocumentDialog } from "@/components/documents/UploadDocumentDialog";
 
 interface DashboardHeaderProps {
   title: string;
@@ -25,6 +29,10 @@ export function DashboardHeader({ title, subtitle }: DashboardHeaderProps) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [fullName, setFullName] = useState<string>("");
+  const [showJobDialog, setShowJobDialog] = useState(false);
+  const [showClientDialog, setShowClientDialog] = useState(false);
+  const [showTaskDialog, setShowTaskDialog] = useState(false);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -53,6 +61,7 @@ export function DashboardHeader({ title, subtitle }: DashboardHeaderProps) {
   };
 
   return (
+    <>
     <header className="flex items-center justify-between h-16 px-6 border-b border-border bg-card">
       <div>
         <h1 className="text-xl font-semibold text-foreground">{title}</h1>
@@ -82,10 +91,10 @@ export function DashboardHeader({ title, subtitle }: DashboardHeaderProps) {
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuLabel>Create New</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>New Job</DropdownMenuItem>
-            <DropdownMenuItem>New Client</DropdownMenuItem>
-            <DropdownMenuItem>New Task</DropdownMenuItem>
-            <DropdownMenuItem>Upload Document</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowJobDialog(true)}>New Job</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowClientDialog(true)}>New Client</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowTaskDialog(true)}>New Task</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowUploadDialog(true)}>Upload Document</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -127,5 +136,10 @@ export function DashboardHeader({ title, subtitle }: DashboardHeaderProps) {
         </DropdownMenu>
       </div>
     </header>
+      <AddJobDialog open={showJobDialog} onOpenChange={setShowJobDialog} />
+      <AddClientDialog open={showClientDialog} onOpenChange={setShowClientDialog} />
+      <GlobalAddTaskDialog open={showTaskDialog} onOpenChange={setShowTaskDialog} />
+      <UploadDocumentDialog open={showUploadDialog} onOpenChange={setShowUploadDialog} />
+    </>
   );
 }
