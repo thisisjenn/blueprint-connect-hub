@@ -208,34 +208,155 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 lg:py-32">
+      {/* Pricing Section */}
+      <section id="pricing" className="py-20 lg:py-32">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative rounded-3xl bg-primary overflow-hidden">
-            <div className="absolute inset-0 blueprint-grid opacity-10" />
-            <div className="relative px-8 py-16 lg:px-16 lg:py-24 text-center">
-              <h2 className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-4">
-                Ready to Transform Your Workflow?
-              </h2>
-              <p className="text-lg text-primary-foreground/80 max-w-2xl mx-auto mb-8">
-                Join thousands of construction professionals who trust BlueprintHub to manage their projects.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
-                <Link to="/dashboard">
-                  <Button variant="hero" size="xl" className="gap-2">
-                    Get Started Free
-                    <ArrowRight className="w-5 h-5" />
-                  </Button>
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+              Simple, Transparent{" "}
+              <span className="text-gradient-accent">Pricing</span>
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Choose the plan that fits your business. No hidden fees, cancel anytime.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Starter */}
+            <Card className="relative border-border hover-lift">
+              <CardContent className="p-8">
+                <h3 className="text-lg font-semibold text-foreground mb-1">Starter</h3>
+                <p className="text-sm text-muted-foreground mb-6">For solo contractors</p>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-foreground">$29</span>
+                  <span className="text-muted-foreground">/mo</span>
+                </div>
+                <ul className="space-y-3 mb-8 text-sm text-muted-foreground">
+                  {["Up to 5 active projects", "Client portal", "Document storage (5 GB)", "Email support"].map((f) => (
+                    <li key={f} className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link to="/signup">
+                  <Button variant="outline" className="w-full">Get Started</Button>
                 </Link>
-                <Button 
-                  variant="outline" 
-                  size="xl" 
-                  className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10"
-                >
-                  Schedule a Demo
-                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Professional */}
+            <Card className="relative border-accent shadow-lg hover-lift ring-2 ring-accent/20">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="bg-accent text-accent-foreground text-xs font-semibold px-3 py-1 rounded-full">
+                  Most Popular
+                </span>
+              </div>
+              <CardContent className="p-8">
+                <h3 className="text-lg font-semibold text-foreground mb-1">Professional</h3>
+                <p className="text-sm text-muted-foreground mb-6">For growing teams</p>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-foreground">$79</span>
+                  <span className="text-muted-foreground">/mo</span>
+                </div>
+                <ul className="space-y-3 mb-8 text-sm text-muted-foreground">
+                  {["Unlimited projects", "Client portal & messaging", "Document storage (50 GB)", "Contract management", "Priority support"].map((f) => (
+                    <li key={f} className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link to="/signup">
+                  <Button variant="hero" className="w-full">Get Started</Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Enterprise */}
+            <Card className="relative border-border hover-lift">
+              <CardContent className="p-8">
+                <h3 className="text-lg font-semibold text-foreground mb-1">Enterprise</h3>
+                <p className="text-sm text-muted-foreground mb-6">For large firms</p>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-foreground">$199</span>
+                  <span className="text-muted-foreground">/mo</span>
+                </div>
+                <ul className="space-y-3 mb-8 text-sm text-muted-foreground">
+                  {["Everything in Professional", "Unlimited storage", "Custom branding", "API access", "Dedicated account manager"].map((f) => (
+                    <li key={f} className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link to="/signup">
+                  <Button variant="outline" className="w-full">Contact Sales</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-20 lg:py-32 bg-muted/30">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-16 max-w-5xl mx-auto">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+                Get in <span className="text-gradient-accent">Touch</span>
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8">
+                Have questions or need a custom solution? Our team is here to help you find the right fit.
+              </p>
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <MessageSquare className="w-5 h-5 text-accent" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground">Chat with us</h4>
+                    <p className="text-sm text-muted-foreground">Our team typically replies within 2 hours.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-5 h-5 text-accent" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground">Schedule a demo</h4>
+                    <p className="text-sm text-muted-foreground">See BlueprintHub in action with a personalized walkthrough.</p>
+                  </div>
+                </div>
               </div>
             </div>
+
+            <Card className="border-border">
+              <CardContent className="p-8">
+                <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-foreground">First Name</label>
+                      <input type="text" placeholder="John" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-foreground">Last Name</label>
+                      <input type="text" placeholder="Doe" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Email</label>
+                    <input type="email" placeholder="john@company.com" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Message</label>
+                    <textarea rows={4} placeholder="Tell us about your project..." className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none" />
+                  </div>
+                  <Button variant="hero" className="w-full">Send Message</Button>
+                </form>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
