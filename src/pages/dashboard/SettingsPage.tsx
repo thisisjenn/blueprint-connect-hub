@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
@@ -31,6 +32,8 @@ interface Profile {
 }
 
 export default function SettingsPage() {
+  const [searchParams] = useSearchParams();
+  const defaultTab = searchParams.get("tab") || "profile";
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -198,7 +201,7 @@ export default function SettingsPage() {
       />
 
       <div className="flex-1 overflow-auto p-6">
-        <Tabs defaultValue="profile" className="space-y-6">
+        <Tabs defaultValue={defaultTab} className="space-y-6">
           <TabsList className="flex flex-wrap h-auto gap-2">
             <TabsTrigger value="profile" className="gap-2">
               <User className="w-4 h-4" />
