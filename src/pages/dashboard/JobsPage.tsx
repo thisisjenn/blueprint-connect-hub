@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ interface JobWithMeta {
   start_date: string | null;
   description: string | null;
   client_id: string | null;
+  client_record_id: string | null;
   clientName: string | null;
   completedTasks: number;
   totalTasks: number;
@@ -52,6 +54,8 @@ interface JobWithMeta {
 
 export default function JobsPage() {
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const clientFilter = searchParams.get("client");
   const [filter, setFilter] = useState<JobStatus>("all");
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,7 +64,7 @@ export default function JobsPage() {
 
   // Fetch jobs with client names and task counts
   const { data: jobs = [], isLoading: jobsLoading } = useQuery({
-    queryKey: ["jobs"],
+    queryKey: ["jobs", clientFilter],
     queryFn: async () => {
       const [projectsRes, clientsRes] = await Promise.all([
         supabase
@@ -87,7 +91,7 @@ export default function JobsPage() {
         return clientByEmail.get(email) ?? null;
       };
 
-      return (projectsRes.data ?? []).map((p: any): JobWithMeta => {
+      const allJobs = (projectsRes.data ?? []).map((p: any): JobWithMeta => {
         const tasks = p.project_tasks ?? [];
         const completed = tasks.filter((t: any) => t.status === "completed").length;
         const total = tasks.length;
@@ -100,12 +104,25 @@ export default function JobsPage() {
           start_date: p.start_date,
           description: p.description,
           client_id: p.client_id,
+          client_record_id: p.client_record_id,
           clientName: getClientName(p.client_id),
           completedTasks: completed,
           totalTasks: total,
           progress: total > 0 ? Math.round((completed / total) * 100) : 0,
         };
       });
+
+      if (clientFilter) {
+        // Build auth user_id for this client record
+        const clientRecord = (clientsRes.data ?? []).find((c: any) => c.id === clientFilter);
+        const clientAuthId = clientRecord?.email
+          ? (profilesRes.data ?? []).find((p: any) => p.email === clientRecord.email)?.user_id
+          : null;
+        return allJobs.filter(
+          (j) => j.client_record_id === clientFilter || (clientAuthId && j.client_id === clientAuthId)
+        );
+      }
+      return allJobs;
     },
   });
 
@@ -179,6 +196,12 @@ export default function JobsPage() {
         {/* Jobs List */}
         <div className="w-full lg:w-[400px] border-r border-border flex flex-col">
           <div className="p-4 border-b border-border space-y-3">
+            {clientFilter && (
+              <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2 text-sm">
+                <span className="text-muted-foreground">Filtered by client</span>
+                <Button variant="ghost" size="sm" onClick={() => setSearchParams({})}>Clear filter</Button>
+              </div>
+            )}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input placeholder="Search jobs..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
