@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,7 @@ import { AddJobDialog } from "@/components/jobs/AddJobDialog";
 type ClientType = "all" | "homeowner" | "contractor" | "business";
 
 export default function ClientsPage() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<ClientType>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -188,11 +190,9 @@ export default function ClientsPage() {
                             const projects = client.projects ?? [];
                             const project = projects.find((p: any) => p.status === "active") || projects[0];
                             if (project) {
-                              window.location.href = `/dashboard/messages?project=${project.id}`;
+                              navigate(`/dashboard/messages?project=${project.id}`);
                             } else {
-                              setJobClientId(client.id);
-                              setShowAddJob(true);
-                              toast.info("Create a project for this client first to start messaging.");
+                              toast.info("No projects yet for this client. Create a project first to start messaging.");
                             }
                           }}>
                             <Mail className="w-4 h-4 mr-2" />
@@ -236,7 +236,7 @@ export default function ClientsPage() {
                         <p className="text-2xl font-bold text-foreground">{total}</p>
                         <p className="text-xs text-muted-foreground">Total Jobs</p>
                       </div>
-                      <Button variant="outline" size="sm">View Jobs</Button>
+                      <Button variant="outline" size="sm" onClick={() => navigate(`/dashboard/jobs?client=${client.id}`)}>View Jobs</Button>
                     </div>
                   </CardContent>
                 </Card>
