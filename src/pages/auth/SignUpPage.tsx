@@ -50,6 +50,40 @@ export default function SignUpPage() {
     const { error } = await signUp(email, password, fullName, role as "client" | "contractor");
 
     if (error) {
+      const normalizedMessage = error.message.toLowerCase();
+
+      if (
+        normalizedMessage.includes("already registered") ||
+        normalizedMessage.includes("already exists")
+      ) {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (!signInError) {
+          toast.success("Account already exists — signed you in.");
+          navigate("/");
+          return;
+        }
+
+        const { error: resendError } = await supabase.auth.resend({
+          type: "signup",
+          email,
+          options: {
+            emailRedirectTo: window.location.origin,
+          },
+        });
+
+        toast.error(
+          resendError
+            ? "Account already exists. Use Forgot password to access it."
+            : "Account already exists. We resent your confirmation email."
+        );
+        setIsLoading(false);
+        return;
+      }
+
       toast.error(error.message);
       setIsLoading(false);
       return;
