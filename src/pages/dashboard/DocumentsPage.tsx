@@ -102,10 +102,6 @@ export default function DocumentsPage() {
         .upload(filePath, uploadFile);
       if (storageError) throw storageError;
 
-      const { data: urlData } = supabase.storage
-        .from("project-files")
-        .getPublicUrl(filePath);
-
       const fileType = uploadFile.type.startsWith("image/")
         ? "image"
         : uploadFile.type.includes("pdf")
@@ -114,7 +110,8 @@ export default function DocumentsPage() {
 
       const { error: dbError } = await supabase.from("project_files").insert({
         name: uploadFile.name,
-        file_url: urlData.publicUrl,
+        // Store the raw storage path; signed URLs are generated on demand.
+        file_url: filePath,
         file_type: fileType,
         file_size: uploadFile.size,
         project_id: uploadProjectId,
