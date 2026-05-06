@@ -13,6 +13,8 @@ import {
   X,
   HardHat,
   User,
+  Calendar as CalendarIcon,
+  FileSignature,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -31,6 +33,8 @@ const navItems = [
   { icon: LayoutDashboard, label: "Overview", href: "/portal" },
   { icon: FolderOpen, label: "Documents", href: "/portal/documents" },
   { icon: CheckSquare, label: "Checklist", href: "/portal/checklist" },
+  { icon: CalendarIcon, label: "Schedule", href: "/portal/schedule" },
+  { icon: FileSignature, label: "Contracts", href: "/portal/contracts" },
   { icon: MessageSquare, label: "Messages", href: "/portal/messages" },
   { icon: Receipt, label: "Invoices", href: "/portal/invoices" },
   { icon: Camera, label: "Upload Photos", href: "/portal/photos" },
