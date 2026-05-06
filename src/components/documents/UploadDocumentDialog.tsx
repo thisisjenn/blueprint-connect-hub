@@ -65,13 +65,12 @@ export function UploadDocumentDialog({ open, onOpenChange }: UploadDocumentDialo
         .upload(filePath, uploadFile);
       if (storageError) throw storageError;
 
-      const { data: urlData } = supabase.storage.from("project-files").getPublicUrl(filePath);
-
       const fileType = uploadFile.type.startsWith("image/") ? "image" : "document";
 
       const { error: dbError } = await supabase.from("project_files").insert({
         name: uploadFile.name,
-        file_url: urlData.publicUrl,
+        // Store the raw storage path; signed URLs are generated at view time.
+        file_url: filePath,
         file_type: fileType,
         file_size: uploadFile.size,
         project_id: projectId,
