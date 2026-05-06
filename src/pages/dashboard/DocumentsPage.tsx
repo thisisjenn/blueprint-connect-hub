@@ -185,6 +185,21 @@ export default function DocumentsPage() {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
+  const openSignedUrl = async (path: string, download = false) => {
+    if (/^https?:\/\//i.test(path)) {
+      window.open(path, "_blank", "noopener,noreferrer");
+      return;
+    }
+    const { data, error } = await supabase.storage
+      .from("project-files")
+      .createSignedUrl(path, 3600, download ? { download: true } : undefined);
+    if (error || !data) {
+      toast.error("Could not open file");
+      return;
+    }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  };
+
   const filteredFiles = files.filter(
     (file: any) =>
       file.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -296,11 +311,9 @@ export default function DocumentsPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <a href={file.file_url} target="_blank" rel="noopener noreferrer">
-                            <Download className="w-4 h-4 mr-2" />
-                            Download
-                          </a>
+                        <DropdownMenuItem onClick={() => openSignedUrl(file.file_url, true)}>
+                          <Download className="w-4 h-4 mr-2" />
+                          Download
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => toggleShareMutation.mutate({ id: file.id, shared: !file.is_shared_with_client })}>
                           <Share2 className="w-4 h-4 mr-2" />
@@ -356,11 +369,9 @@ export default function DocumentsPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <a href={file.file_url} target="_blank" rel="noopener noreferrer">
-                            <Download className="w-4 h-4 mr-2" />
-                            Download
-                          </a>
+                        <DropdownMenuItem onClick={() => openSignedUrl(file.file_url, true)}>
+                          <Download className="w-4 h-4 mr-2" />
+                          Download
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => toggleShareMutation.mutate({ id: file.id, shared: !file.is_shared_with_client })}>
                           <Share2 className="w-4 h-4 mr-2" />
