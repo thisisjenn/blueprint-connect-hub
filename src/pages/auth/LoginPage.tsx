@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -12,24 +12,46 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, user, role } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect once auth state (and role) are ready
+  useEffect(() => {
+    if (!user) return;
+    if (role === "contractor") {
+      navigate("/dashboard", { replace: true });
+    } else if (role === "client") {
+      navigate("/portal", { replace: true });
+    }
+    // if user but role still null, wait for role to load
+  }, [user, role, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const { error } = await signIn(email, password);
+    try {
+      const { error } = await signIn(email, password);
 
-    if (error) {
-      toast.error(error.message);
+      if (error) {
+        const msg = error.message?.toLowerCase() ?? "";
+        if (msg.includes("invalid login credentials")) {
+          toast.error("Incorrect email or password.");
+        } else if (msg.includes("email not confirmed")) {
+          toast.error("Please confirm your email before signing in.");
+        } else if (msg.includes("rate limit")) {
+          toast.error("Too many attempts. Please try again in a moment.");
+        } else {
+          toast.error(error.message || "Unable to sign in. Please try again.");
+        }
+        return;
+      }
+
+      toast.success("Welcome back!");
+      // Redirect handled by useEffect once role is available
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    toast.success("Welcome back!");
-    // Navigation will be handled by route guards based on role
-    navigate("/");
   };
 
   return (
