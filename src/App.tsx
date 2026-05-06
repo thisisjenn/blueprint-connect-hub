@@ -67,8 +67,13 @@ function RoleBasedRedirect() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // If no role yet (might still be loading), show landing
-  return <LandingPage />;
+  // User is authenticated but role hasn't loaded yet — show spinner instead of
+  // flashing the landing page (which makes login feel broken).
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+    </div>
+  );
 }
 
 const App = () => (
