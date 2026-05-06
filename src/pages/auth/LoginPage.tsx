@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { HardHat, Loader2 } from "lucide-react";
+import { ArrowLeft, HardHat, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function LoginPage() {
@@ -57,6 +57,14 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
+        <div className="mb-4">
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/">
+              <ArrowLeft className="w-4 h-4" />
+              Back to homepage
+            </Link>
+          </Button>
+        </div>
         <div className="flex justify-center mb-8">
           <Link to="/" className="flex items-center gap-3">
             <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary">
