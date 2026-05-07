@@ -35,8 +35,6 @@ import PortalMessages from "./pages/portal/PortalMessages";
 import PortalInvoices from "./pages/portal/PortalInvoices";
 import PortalPhotos from "./pages/portal/PortalPhotos";
 import PortalProjectDetail from "./pages/portal/PortalProjectDetail";
-import PortalSchedule from "./pages/portal/PortalSchedule";
-import PortalContracts from "./pages/portal/PortalContracts";
 
 // Protected Route Component
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
@@ -117,8 +115,6 @@ const App = () => (
                   <Route path="messages" element={<PortalMessages />} />
                   <Route path="invoices" element={<PortalInvoices />} />
                   <Route path="photos" element={<PortalPhotos />} />
-                  <Route path="schedule" element={<PortalSchedule />} />
-                  <Route path="contracts" element={<PortalContracts />} />
                   <Route path="projects/:projectId" element={<PortalProjectDetail />} />
                 </Route>
               </Route>

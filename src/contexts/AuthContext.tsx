@@ -10,7 +10,7 @@ interface AuthContextType {
   role: UserRole;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName: string, role: "client" | "contractor") => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .maybeSingle();
       setRole(roleData?.role as UserRole ?? null);
     } catch (error) {
-      if (import.meta.env.DEV) console.error("Failed to fetch role:", error);
+      console.error("Failed to fetch role:", error);
       setRole(null);
     }
   };
@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           await fetchRole(session.user.id);
         }
       } catch (error) {
-        if (import.meta.env.DEV) console.error("Auth initialization error:", error);
+        console.error("Auth initialization error:", error);
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -92,14 +92,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error };
   };
 
-  const signUp = async (email: string, password: string, fullName: string) => {
+  const signUp = async (email: string, password: string, fullName: string, userRole: "client" | "contractor") => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        // Never include role in signup metadata. Role is assigned server-side
-        // by the handle_new_user trigger (defaults to 'client').
-        data: { full_name: fullName },
+        data: { full_name: fullName, role: userRole },
         emailRedirectTo: window.location.origin,
       },
     });
