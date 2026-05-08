@@ -10,7 +10,7 @@ interface AuthContextType {
   role: UserRole;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, fullName: string, role: "client" | "contractor") => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -92,12 +92,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error };
   };
 
-  const signUp = async (email: string, password: string, fullName: string, userRole: "client" | "contractor") => {
+  const signUp = async (email: string, password: string, fullName: string) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName, role: userRole },
+        // Role is intentionally NOT included — all signups are clients.
+        // Privileged roles must be granted server-side only.
+        data: { full_name: fullName },
         emailRedirectTo: window.location.origin,
       },
     });
