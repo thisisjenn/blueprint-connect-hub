@@ -81,7 +81,7 @@ export function ClientPortalLayout() {
           <div className="flex items-center gap-4">
             {/* Mobile Menu */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-              <SheetTrigger asChild className="lg:hidden">
+              <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <Menu className="w-5 h-5" />
                 </Button>
@@ -106,30 +106,6 @@ export function ClientPortalLayout() {
               <span className="font-semibold text-lg hidden sm:inline">BlueprintHub</span>
             </Link>
           </div>
-
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.href || 
-                (item.href !== "/portal" && location.pathname.startsWith(item.href));
-              
-              return (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  className={cn(
-                    "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors",
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground/70 hover:bg-muted hover:text-foreground"
-                  )}
-                >
-                  <item.icon className="w-4 h-4" />
-                  <span className="font-medium">{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
 
           {/* User Menu */}
           <DropdownMenu>
