@@ -40,6 +40,8 @@ import PortalContracts from "./pages/portal/PortalContracts";
 import PortalSelections from "./pages/portal/PortalSelections";
 import PortalDailyUpdates from "./pages/portal/PortalDailyUpdates";
 import PortalHomeManual from "./pages/portal/PortalHomeManual";
+import DailyUpdatesPage from "./pages/dashboard/DailyUpdatesPage";
+import SelectionsPage from "./pages/dashboard/SelectionsPage";
 
 // Protected Route Component
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
@@ -107,6 +109,8 @@ const App = () => (
                   <Route path="messages" element={<MessagesPage />} />
                   <Route path="schedule" element={<SchedulePage />} />
                   <Route path="contracts" element={<ContractsPage />} />
+                  <Route path="updates" element={<DailyUpdatesPage />} />
+                  <Route path="selections" element={<SelectionsPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                 </Route>
               </Route>
