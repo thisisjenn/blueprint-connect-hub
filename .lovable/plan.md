@@ -1,51 +1,116 @@
-## Problem
+# Blueprint Hub — Gap Analysis & Build Plan
 
-Currently every contractor sees every other contractor's data. Root cause: the `projects` table has no contractor owner column. All RLS policies on projects, tasks, files, invoices, messages, checklists, and photos use `is_contractor()`, which is true for ANY contractor. Only `clients` is correctly scoped (by `user_id`).
+Below is what your current site has vs. the spec, then a proposed phased plan to close the gaps. I won't change anything until you pick what to tackle.
 
-Clients are mostly OK because their RLS uses `client_id = auth.uid()` on projects, but they can be cross-contaminated wherever the UI fetches without filtering.
+## What you already have
 
-## Fix
+**Marketing**
+- Landing page (single file)
+- Waitlist/contact form, pricing, anchor links
 
-### 1. Database migration (root fix)
+**Auth**
+- Email/password login, signup, forgot/reset
+- Role at signup (client / contractor)
+- Role-based redirect after login
 
-Add contractor ownership to `projects` and cascade scoping through it.
+**Contractor dashboard** (`/dashboard`)
+- Overview (Home), Jobs, Clients, Documents, Messages, Schedule, Contracts, Settings
+- Data isolation via RLS by `contractor_id`
+- Notifications bell, realtime messaging
 
-- Add `projects.contractor_id uuid` (nullable initially for backfill, then enforce via app logic).
-- Backfill: `UPDATE projects SET contractor_id = clients.user_id FROM clients WHERE projects.client_record_id = clients.id`. For any remaining NULL projects, leave NULL (orphan; only the creator-less rows).
-- Add helper: `public.owns_project(_project_id uuid)` → `SELECT EXISTS(SELECT 1 FROM projects WHERE id=_project_id AND contractor_id=auth.uid())`. SECURITY DEFINER, stable.
-- Replace `is_contractor()` RLS on the following tables with `owns_project(project_id)` (keeping client policies intact):
-  - `projects` SELECT/UPDATE/DELETE → `contractor_id = auth.uid()`. INSERT WITH CHECK → `is_contractor() AND contractor_id = auth.uid()`.
-  - `project_tasks`, `project_files`, `project_messages`, `client_checklist_items`, `client_photo_uploads`, `invoices` → contractor policies use `owns_project(project_id)`.
-- Update `is_project_member` to use `owns_project` instead of `is_contractor`.
-- Update `set_client_record_id` trigger to also set `contractor_id` from the inserting user (`auth.uid()`) when missing.
-- Update notification triggers (`notify_new_project`, `notify_new_task`, `notify_new_document`, `notify_new_message`) to notify only the project's `contractor_id` instead of all contractors.
-- Tighten `profiles` SELECT: replace "Contractors can view all profiles" with a policy allowing a contractor to view profiles only of clients on their projects (via `EXISTS` over projects.contractor_id = auth.uid() AND projects.client_id = profiles.user_id).
+**Client portal** (`/portal`)
+- Overview, Documents, Checklist, Messages, Invoices, Photos, Project Detail
+- Collapsible drawer at all sizes
 
-### 2. Frontend changes (defense in depth + correct UI)
+**Backend**
+- Supabase (Lovable Cloud), storage buckets, RLS hardened
+- Tables: projects, clients, project_tasks/files/messages, invoices, checklist, photos, profiles, notifications, user_roles
 
-For every contractor page that queries Supabase, RLS will now naturally scope. But several pages currently filter by `is_contractor` only or fetch globally — verify and add explicit `.eq('contractor_id', user.id)` on `projects` queries, and rely on RLS for child tables. Touch:
+## What's missing vs. spec
 
-- `src/pages/dashboard/DashboardHome.tsx` — counts and recent lists scoped via projects join.
-- `src/pages/dashboard/JobsPage.tsx`, `ClientsPage.tsx` (already filters by user_id), `DocumentsPage.tsx`, `MessagesPage.tsx`, `SchedulePage.tsx`, `ContractsPage.tsx`.
-- `AddJobDialog.tsx` — set `contractor_id: user.id` on insert.
-- Any project detail / task / file pages — no change needed (RLS handles it) but verify queries don't rely on cross-contractor data.
+### Brand & design
+- Fonts: spec wants **DM Serif Display + Plus Jakarta Sans** — current theme uses different typography
+- Color palette doesn't match exactly (warm off-white #F7F5F0, deep navy #1C2B3A, **brass gold #C49A3C**)
+- No blueprint grid texture / architectural line accents on hero & CTA sections
+- No Framer Motion scroll-reveal animations
 
-Client portal pages already scope via `client_id = auth.uid()` through RLS; verify each portal page filters projects by `client_id` explicitly too.
+### Landing page content gaps
+- Hero copy/CTAs don't match ("From Inspiration to Move-In Day…")
+- Missing **Problem Statement** 3-column section
+- Features section needs the **6 specific AI features** (Design-to-Scope, Budget/Schedule Engine, Visual Dashboard, Permit Checker, Change Order Simulator, Digital Home Manual)
+- Missing **How It Works** 3-step section
+- Missing **Who It's For** 3 cards (Homeowners / Contractors / Architects)
+- Missing **Additional Features grid** (9 smaller cards)
+- Missing testimonials section
+- Floating dashboard mockup card in hero
 
-### 3. UI / design
+### Auth gaps
+- No **Architect/Designer** role (only client + contractor)
+- No **Google OAuth** button
+- No blueprint grid background on auth pages
 
-No visual changes. Layouts, colors, and components stay identical.
+### Homeowner portal gaps (spec lists 10 sections — you have 6)
+- ❌ **Schedule** (calendar + Gantt)
+- ❌ **Contracts** (list, e-sign placeholder, change orders)
+- ❌ **Budget & Payments** (milestones, affordability planner) — partly covered by Invoices
+- ❌ **Approvals & Selections** + **Change Order Simulator**
+- ❌ **Daily Updates** feed
+- ❌ **Home Manual** (paint, appliances, warranties, contractors)
+- Overview missing: clickable floor plan, milestone list, 4-stat summary cards in spec format
+- Photos: missing **before/after slider**
+- Messages: missing channel grouping (General/Design/Contractor/Permits)
 
-## Technical notes
+### Contractor dashboard gaps
+- ❌ **AI Tools page** (the centerpiece) — Design-to-Scope, Permit Checker, Conflict Detector, Meeting Summarizer
+- ❌ **Change Orders** page (workflow + simulator)
+- ❌ **Financials** page (separate from Contracts)
+- ❌ **Alerts & Conflicts** page (emotional risk dashboard, backorders, dependency warnings)
+- Overview missing: alerts panel, projects table format per spec
 
-- New column `projects.contractor_id` references the auth user id (no FK to auth.users per project guidelines).
-- Existing `client_record_id` and `client_id` keep current behavior.
-- New `owns_project` SECURITY DEFINER prevents recursive RLS on projects.
-- All policies remain `TO authenticated`.
-- After migration, the Supabase types file regenerates automatically; frontend insert calls must include `contractor_id`.
+### Tech stack gaps
+- No **Framer Motion**
+- No **Recharts** for budget/schedule viz
+- No **React Hook Form + Zod** (likely using plain forms)
+- No **AI integration** — spec calls for Claude; recommend **Lovable AI Gateway** instead (Gemini/GPT-5, no key needed)
+- No seed data for "Johnson Kitchen & Bath Remodel"
 
-## Out of scope
+## Proposed phased plan
 
-- No schema change to clients (already scoped).
-- No UI redesign.
-- Historical orphan projects (no contractor_id) will become invisible to contractors — acceptable per the isolation requirement; user can reassign manually if needed.
+Each phase is a separate scope you can approve one at a time. I'd suggest this order:
+
+**Phase 1 — Brand & landing page polish**
+- Swap fonts to DM Serif Display + Plus Jakarta Sans
+- Tune color tokens to exact spec hex values
+- Add blueprint grid texture, architectural line accents
+- Rewrite landing sections to match spec (Hero, Problem, 6 Features, How It Works, Who It's For, Additional Features grid, Testimonials)
+- Add Framer Motion scroll reveals
+
+**Phase 2 — Auth additions**
+- Add "Architect/Designer" role to enum + signup
+- Add Google OAuth button (requires you to enable Google provider in Lovable Cloud auth settings)
+- Blueprint grid auth background
+
+**Phase 3 — Client portal completion**
+Add 4 new pages: Schedule, Contracts, Budget & Payments, Approvals & Selections, Daily Updates, Home Manual. Adds DB tables: `project_milestones`, `payment_milestones`, `change_orders`, `selections`, `daily_updates`, `home_manual_entries`. Photos before/after slider. Messages channel grouping.
+
+**Phase 4 — Contractor dashboard expansion**
+Add: Change Orders, Financials, Alerts & Conflicts pages. Enhance Overview with alerts panel.
+
+**Phase 5 — AI Tools (largest)**
+Add `/dashboard/ai-tools` with 4 tools backed by Lovable AI Gateway edge functions:
+1. Design-to-Scope Translator (text + image → scope table JSON)
+2. Permit Readiness Checker (PDF upload → checklist)
+3. Conflict Detector (multi-file → conflict list)
+4. Meeting Summarizer (text/audio → structured output)
+
+**Phase 6 — Polish & seed**
+- Recharts for budget/schedule visualizations
+- React Hook Form + Zod on all forms
+- Seed "Johnson Kitchen & Bath Remodel" demo project
+
+## Questions before I start
+
+1. **Which phase(s)** do you want first? (I'd recommend Phase 1 alone — it's visible immediately and low-risk.)
+2. **Switch AI provider** from Claude (spec) to **Lovable AI Gateway** (no API key, included)? Strongly recommended.
+3. **Google OAuth** — do you want it, and have you set up a Google OAuth client to paste into Cloud auth?
+4. **Replace existing landing page** wholesale to match spec, or layer the missing sections on top of what's there?
