@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { BeforeAfterSlider } from "@/components/portal/BeforeAfterSlider";
 
 interface Project {
   id: string;
@@ -47,6 +48,8 @@ const categories = [
   { value: "issue_report", label: "Issue Report", icon: AlertTriangle, color: "bg-destructive" },
   { value: "reference", label: "Reference/Inspiration", icon: Lightbulb, color: "bg-accent" },
   { value: "document_scan", label: "Document Scan", icon: FileText, color: "bg-info" },
+  { value: "before", label: "Before", icon: ImageIcon, color: "bg-muted-foreground" },
+  { value: "after", label: "After", icon: ImageIcon, color: "bg-success" },
 ];
 
 export default function PortalPhotos() {
@@ -396,6 +399,23 @@ export default function PortalPhotos() {
       </div>
 
       {/* Photos Grid */}
+      {(() => {
+        const beforePhoto = [...photos].reverse().find((p) => p.category === "before");
+        const afterPhoto = [...photos].reverse().find((p) => p.category === "after");
+        if (!beforePhoto || !afterPhoto) return null;
+        const beforeUrl = signedUrls[beforePhoto.id];
+        const afterUrl = signedUrls[afterPhoto.id];
+        if (!beforeUrl || !afterUrl) return null;
+        return (
+          <Card>
+            <CardHeader><CardTitle>Before & After</CardTitle></CardHeader>
+            <CardContent>
+              <BeforeAfterSlider beforeUrl={beforeUrl} afterUrl={afterUrl} />
+            </CardContent>
+          </Card>
+        );
+      })()}
+
       {photos.length === 0 ? (
         <Card>
           <CardContent className="p-12 text-center">

@@ -245,6 +245,42 @@ export type Database = {
         }
         Relationships: []
       }
+      project_daily_updates: {
+        Row: {
+          created_at: string
+          id: string
+          photo_url: string | null
+          posted_by: string | null
+          project_id: string
+          summary: string | null
+          title: string
+          update_date: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          photo_url?: string | null
+          posted_by?: string | null
+          project_id: string
+          summary?: string | null
+          title: string
+          update_date?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          photo_url?: string | null
+          posted_by?: string | null
+          project_id?: string
+          summary?: string | null
+          title?: string
+          update_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       project_files: {
         Row: {
           category: string | null
@@ -329,6 +365,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      project_selections: {
+        Row: {
+          client_notes: string | null
+          created_at: string
+          decided_at: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          image_url: string | null
+          option_name: string | null
+          project_id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          client_notes?: string | null
+          created_at?: string
+          decided_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          image_url?: string | null
+          option_name?: string | null
+          project_id: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          client_notes?: string | null
+          created_at?: string
+          decided_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          image_url?: string | null
+          option_name?: string | null
+          project_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       project_tasks: {
         Row: {
