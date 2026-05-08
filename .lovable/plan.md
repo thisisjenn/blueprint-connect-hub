@@ -1,24 +1,27 @@
-## Problem
+## Goal
 
-On `/signup` the "I am a…" label shows but the **Contractor / Client** cards are missing.
+Make the client portal use the same hamburger-menu + slide-out drawer navigation on **all** screen sizes, instead of switching to a horizontal nav bar at desktop widths (≥1024px).
 
-The form populates the cards from `supabase.rpc("get_available_roles")`. Visitors on the signup page are not signed in, and the project's security hardening revokes `EXECUTE` on `SECURITY DEFINER` functions for the `anon` role. The RPC therefore returns no rows for unauthenticated users, `availableRoles` stays empty, and the radio cards never render.
+## Why
 
-## Fix
+Currently `ClientPortalLayout.tsx` shows two different navs based on viewport:
+- `< 1024px` → hamburger button + `Sheet` drawer (the look the user prefers)
+- `≥ 1024px` → horizontal nav bar across the header
 
-Stop depending on a database round-trip for a static, two-value choice.
+On the live domain in a wide browser window, users see the horizontal bar, which feels inconsistent with the preview.
 
-1. In `src/pages/auth/SignUpPage.tsx`:
-   - Remove the `useEffect` + `get_available_roles` RPC call and the `rolesLoading` / `availableRoles` state.
-   - Hardcode the two options as a constant: `[{ value: "contractor", label: "Contractor", description: "Manage projects & clients", icon: HardHat }, { value: "client", label: "Client", description: "Track your project & files", icon: Home }]`.
-   - Default `role` to empty string so the user must pick one; keep `required` behavior by validating before submit and disabling the submit button until a role is chosen.
-   - Render the two cards in a 2-column grid using the existing RadioGroup styling (selected card gets `border-primary bg-primary/5`).
-   - Make the "Contractor" card visually first/most prominent per the original requirement.
+## Change
 
-2. No DB or `AuthContext` change needed — `signUp()` already forwards the chosen role into `raw_user_meta_data.role`, and the `handle_new_user` trigger (already updated last turn) honors it.
+In `src/components/layout/ClientPortalLayout.tsx`:
 
-3. Verification: reload `/signup` in the browser, confirm both cards render for an anonymous visitor, confirm submit is blocked until a card is selected, confirm a new contractor signup lands on `/dashboard` and a new client signup lands on `/portal`.
+1. **Remove the desktop horizontal nav** (the `<nav className="hidden lg:flex …">` block with the inline mapped links).
+2. **Always show the hamburger trigger** by removing the `lg:hidden` class on the `SheetTrigger`, so the menu button appears on every screen size.
+3. **Keep everything else as-is**: logo, user avatar dropdown, sign-out, the `Sheet`/drawer contents, and `NavLinks` styling.
 
-## Out of scope
+No changes to routing, auth, data, or any other layout (the contractor `DashboardLayout` is untouched).
 
-- No migration. The `get_available_roles` RPC stays as-is for any authenticated callers; we just stop relying on it from the public signup page.
+## Result
+
+At every viewport — mobile, tablet, and desktop — the client portal shows:
+- Header with hamburger ☰ on the left, logo, and avatar on the right
+- Tapping ☰ slides the navigation drawer in from the left with all portal links
