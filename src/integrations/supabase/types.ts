@@ -467,7 +467,7 @@ export type Database = {
       owns_project: { Args: { _project_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "client" | "contractor"
+      app_role: "client" | "contractor" | "designer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -595,7 +595,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["client", "contractor"],
+      app_role: ["client", "contractor", "designer"],
     },
   },
 } as const
