@@ -379,6 +379,7 @@ export type Database = {
           address: string | null
           client_id: string | null
           client_record_id: string | null
+          contractor_id: string | null
           created_at: string | null
           description: string | null
           end_date: string | null
@@ -392,6 +393,7 @@ export type Database = {
           address?: string | null
           client_id?: string | null
           client_record_id?: string | null
+          contractor_id?: string | null
           created_at?: string | null
           description?: string | null
           end_date?: string | null
@@ -405,6 +407,7 @@ export type Database = {
           address?: string | null
           client_id?: string | null
           client_record_id?: string | null
+          contractor_id?: string | null
           created_at?: string | null
           description?: string | null
           end_date?: string | null
@@ -461,6 +464,7 @@ export type Database = {
       is_client_for_project: { Args: { _project_id: string }; Returns: boolean }
       is_contractor: { Args: never; Returns: boolean }
       is_project_member: { Args: { _project_id: string }; Returns: boolean }
+      owns_project: { Args: { _project_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "client" | "contractor"
