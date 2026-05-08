@@ -31,22 +31,20 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-background p-4 overflow-hidden">
-      <div className="absolute inset-0 blueprint-grid opacity-30 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background pointer-events-none" />
-      <div className="relative w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
           <Link to="/" className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary border border-accent/40">
-              <HardHat className="w-7 h-7 text-accent" />
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary">
+              <HardHat className="w-7 h-7 text-primary-foreground" />
             </div>
-            <span className="font-display text-2xl text-foreground">Blueprint Hub</span>
+            <span className="font-bold text-2xl text-foreground">BlueprintHub</span>
           </Link>
         </div>
 
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="font-display text-2xl">Forgot Password</CardTitle>
+            <CardTitle className="text-2xl">Forgot Password</CardTitle>
             <CardDescription>
               {sent
                 ? "Check your email for a reset link."

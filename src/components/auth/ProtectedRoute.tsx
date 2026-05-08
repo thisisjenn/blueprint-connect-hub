@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 
 interface ProtectedRouteProps {
-  allowedRoles?: ("client" | "contractor" | "designer")[];
+  allowedRoles?: ("client" | "contractor")[];
   redirectTo?: string;
 }
 
@@ -28,7 +28,7 @@ export function ProtectedRoute({ allowedRoles, redirectTo = "/login" }: Protecte
     if (role === "client") {
       return <Navigate to="/portal" replace />;
     }
-    if (role === "contractor" || role === "designer") {
+    if (role === "contractor") {
       return <Navigate to="/dashboard" replace />;
     }
   }

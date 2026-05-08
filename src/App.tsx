@@ -35,13 +35,6 @@ import PortalMessages from "./pages/portal/PortalMessages";
 import PortalInvoices from "./pages/portal/PortalInvoices";
 import PortalPhotos from "./pages/portal/PortalPhotos";
 import PortalProjectDetail from "./pages/portal/PortalProjectDetail";
-import PortalSchedule from "./pages/portal/PortalSchedule";
-import PortalContracts from "./pages/portal/PortalContracts";
-import PortalSelections from "./pages/portal/PortalSelections";
-import PortalDailyUpdates from "./pages/portal/PortalDailyUpdates";
-import PortalHomeManual from "./pages/portal/PortalHomeManual";
-import DailyUpdatesPage from "./pages/dashboard/DailyUpdatesPage";
-import SelectionsPage from "./pages/dashboard/SelectionsPage";
 
 // Protected Route Component
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
@@ -70,7 +63,7 @@ function RoleBasedRedirect() {
     return <Navigate to="/portal" replace />;
   }
 
-  if (role === "contractor" || role === "designer") {
+  if (role === "contractor") {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -100,7 +93,7 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPasswordPage />} />
 
               {/* Contractor Dashboard (protected) */}
-              <Route element={<ProtectedRoute allowedRoles={["contractor", "designer"]} />}>
+              <Route element={<ProtectedRoute allowedRoles={["contractor"]} />}>
                 <Route path="/dashboard" element={<DashboardLayout />}>
                   <Route index element={<DashboardHome />} />
                   <Route path="jobs" element={<JobsPage />} />
@@ -109,8 +102,6 @@ const App = () => (
                   <Route path="messages" element={<MessagesPage />} />
                   <Route path="schedule" element={<SchedulePage />} />
                   <Route path="contracts" element={<ContractsPage />} />
-                  <Route path="updates" element={<DailyUpdatesPage />} />
-                  <Route path="selections" element={<SelectionsPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                 </Route>
               </Route>
@@ -119,16 +110,11 @@ const App = () => (
               <Route element={<ProtectedRoute allowedRoles={["client"]} />}>
                 <Route path="/portal" element={<ClientPortalLayout />}>
                   <Route index element={<PortalOverview />} />
-                  <Route path="schedule" element={<PortalSchedule />} />
-                  <Route path="updates" element={<PortalDailyUpdates />} />
-                  <Route path="selections" element={<PortalSelections />} />
                   <Route path="documents" element={<PortalDocuments />} />
-                  <Route path="contracts" element={<PortalContracts />} />
                   <Route path="checklist" element={<PortalChecklist />} />
                   <Route path="messages" element={<PortalMessages />} />
                   <Route path="invoices" element={<PortalInvoices />} />
                   <Route path="photos" element={<PortalPhotos />} />
-                  <Route path="manual" element={<PortalHomeManual />} />
                   <Route path="projects/:projectId" element={<PortalProjectDetail />} />
                 </Route>
               </Route>

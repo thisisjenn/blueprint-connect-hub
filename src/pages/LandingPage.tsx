@@ -3,28 +3,15 @@ import {
   HardHat, 
   ArrowRight, 
   CheckCircle2, 
+  Briefcase, 
   Users, 
+  FolderOpen, 
   MessageSquare,
+  FileText,
   Calendar,
+  Shield,
   Zap,
-  Sparkles,
-  Wallet,
-  LayoutDashboard,
-  ShieldCheck,
-  GitCompareArrows,
-  BookOpen,
-  Home,
-  Hammer,
-  Compass,
-  Package,
-  GitBranch,
-  HeartPulse,
-  AlertTriangle,
-  PiggyBank,
-  History,
-  ImageIcon,
-  Store,
-  Mic,
+  Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,119 +19,41 @@ import heroImage from "@/assets/hero-blueprint.jpg";
 
 const features = [
   {
-    icon: Sparkles,
-    title: "AI Design-to-Scope Translator",
-    description: 'Type "I want a spa-like bathroom" and get tile allowance, vanity type, lighting package, plumbing fixtures, waterproofing scope, and a budget range — instantly.',
+    icon: Briefcase,
+    title: "Workflow Management",
+    description: "Manage jobs, tasks, checklists, and recurring work with ease. Keep everything organized in one place.",
   },
   {
-    icon: Wallet,
-    title: "Live Budget & Schedule Impact Engine",
-    description: 'Every design decision updates cost, timeline, and procurement in real time. Change a countertop → see "+$4,200, no delay" or "+$9,800, +3 weeks."',
+    icon: MessageSquare,
+    title: "Client Communication",
+    description: "Centralized messaging, email inbox, and client tasks. Never miss an important update.",
   },
   {
-    icon: LayoutDashboard,
-    title: "Visual Homeowner Dashboard",
-    description: "Tap any room in a floor plan to see material status, contractor schedule, pending approvals, and live budget — no spreadsheets required.",
+    icon: Users,
+    title: "Team Collaboration",
+    description: "Schedule work, share notes, pin important items, and keep your team aligned.",
   },
   {
-    icon: ShieldCheck,
-    title: "AI Permit Readiness Checker",
-    description: "Upload drawings and AI flags missing electrical plans, ventilation notes, setback violations, HOA conflicts, and structural risks before submission.",
+    icon: FolderOpen,
+    title: "Document Management",
+    description: "Easy file uploads, organized folders, and seamless sharing with clients and team members.",
   },
   {
-    icon: GitCompareArrows,
-    title: "Change Order Simulator",
-    description: '"What-if" explorer before approval. Compare options side by side with cost, delay, and tradeoff breakdowns the homeowner actually understands.',
+    icon: FileText,
+    title: "Contract Management",
+    description: "Custom forms, invoicing, payments, and work orders—all in one professional toolkit.",
   },
   {
-    icon: BookOpen,
-    title: "Post-Project Digital Home Manual",
-    description: "Auto-generated owner's manual with paint colors, warranties, maintenance schedules, contractor records, and as-built photos.",
+    icon: Calendar,
+    title: "MasterPlan Dashboard",
+    description: "Track jobs, client tasks, time, and details with comprehensive overview dashboards.",
   },
 ];
 
-const painPoints = [
-  {
-    title: "Scattered Decisions",
-    description: "Fixtures live in one chat, tile in another, schedules in a PDF. Nothing connects.",
-  },
-  {
-    title: "Surprise Costs",
-    description: "Homeowners learn about a $9k overage two weeks after the change was made.",
-  },
-  {
-    title: "Contractor Miscommunication",
-    description: "Drawings, estimates, and contracts disagree — and no one notices until rework starts.",
-  },
-];
-
-const steps = [
-  {
-    n: "01",
-    title: "Upload your plans, inspiration photos, and project details",
-    description: "Drag in floor plans, magazine clippings, contractor estimates — anything you've collected.",
-  },
-  {
-    n: "02",
-    title: "AI translates your vision into scope, budget, and schedule",
-    description: "Get itemized scope, allowance ranges, sequencing, and a permit readiness check.",
-  },
-  {
-    n: "03",
-    title: "Manage every decision, approval, and contractor in one place",
-    description: "Real-time dashboards keep homeowners, designers, and pros aligned through move-in day.",
-  },
-];
-
-const audiences = [
-  {
-    icon: Home,
-    emoji: "🏠",
-    title: "Homeowners",
-    description: "Stay informed without spreadsheets, group texts, or guessing what comes next.",
-  },
-  {
-    icon: Hammer,
-    emoji: "🔨",
-    title: "Contractors & Builders",
-    description: "Streamline client communication, change orders, and material logistics — in one workspace.",
-  },
-  {
-    icon: Compass,
-    emoji: "🎨",
-    title: "Architects & Designers",
-    description: "Bridge design intent and construction execution without losing details in translation.",
-  },
-];
-
-const additionalFeatures = [
-  { icon: Mic, title: "AI Meeting-to-Project Update Automation" },
-  { icon: Package, title: "Real-Time Material Availability & Substitution" },
-  { icon: GitBranch, title: "Design Decision Dependency Map" },
-  { icon: HeartPulse, title: "Homeowner Emotional Risk Dashboard" },
-  { icon: AlertTriangle, title: "AI Conflict Detector (drawings vs estimates)" },
-  { icon: PiggyBank, title: "Homeowner Financing & Affordability Planner" },
-  { icon: History, title: "Unified Design Provenance & Version History" },
-  { icon: ImageIcon, title: "AI Daily Visual Progress Reports" },
-  { icon: Store, title: "Marketplace-Neutral Vendor Recommendations" },
-];
-
-const testimonials = [
-  {
-    name: "Sarah & Mike Reynolds",
-    role: "Homeowners — Whole-house renovation",
-    quote: "For the first time we actually understood what every change cost — before we approved it. Felt like flying with instruments instead of guessing.",
-  },
-  {
-    name: "Daniel Okafor",
-    role: "GC — Okafor Building Co.",
-    quote: "The AI permit checker caught two missing sheets before submittal. That alone saved us a 3-week delay on the Hayes addition.",
-  },
-  {
-    name: "Priya Mehta",
-    role: "Principal — Mehta Studio Architecture",
-    quote: "Finally a tool where the design decisions actually flow into construction. Our handoffs are dramatically cleaner.",
-  },
+const benefits = [
+  { icon: Zap, text: "Save 10+ hours per week on admin tasks" },
+  { icon: Shield, text: "Secure document storage & sharing" },
+  { icon: Clock, text: "Real-time project tracking" },
 ];
 
 export default function LandingPage() {
@@ -155,11 +64,11 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary border border-accent/40">
-                <HardHat className="w-5 h-5 text-accent" />
+              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary">
+                <HardHat className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="font-display text-xl tracking-tight text-foreground">
-                Blueprint Hub
+              <span className="font-semibold text-xl tracking-tight text-foreground">
+                BlueprintHub
               </span>
             </Link>
 
@@ -167,26 +76,23 @@ export default function LandingPage() {
               <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 Features
               </a>
-              <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                How It Works
-              </a>
-              <a href="#who-its-for" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                For Pros
-              </a>
               <a href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 Pricing
+              </a>
+              <a href="#contact" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Contact
               </a>
             </div>
 
             <div className="flex items-center gap-3">
-              <Link to="/login">
+              <Link to="/dashboard">
                 <Button variant="ghost" size="sm">
                   Log in
                 </Button>
               </Link>
-              <Link to="/signup">
+              <Link to="/dashboard">
                 <Button variant="hero" size="sm">
-                  Get Early Access
+                  Get Started
                 </Button>
               </Link>
             </div>
@@ -196,38 +102,44 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative pt-24 pb-20 lg:pt-32 lg:pb-32 overflow-hidden">
-        <div className="absolute inset-0 blueprint-grid opacity-30" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background pointer-events-none" />
+        <div className="absolute inset-0 blueprint-grid opacity-50" />
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-center lg:text-left animate-fade-in-up">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-sm font-medium mb-6">
                 <Zap className="w-4 h-4" />
-                AI-Powered Residential Construction OS
+                Built for Construction Professionals
               </div>
               
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-foreground leading-[1.05] mb-6">
-                From Inspiration to{" "}
-                <span className="text-gradient-accent">Move-In Day</span>
-                {" "}— Managed in One Place
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6">
+                Manage Projects{" "}
+                <span className="text-gradient-accent">Like a Pro</span>
               </h1>
               
               <p className="text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-8">
-                Blueprint Hub connects your home design decisions to budgets, schedules, materials, permits, and contractor workflows in real time.
+                The all-in-one project management platform for draftsmen, contractors, and homeowners. 
+                Streamline workflows, communicate better, and deliver projects on time.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start mb-8">
-                <Link to="/signup">
+                <Link to="/dashboard">
                   <Button variant="hero" size="xl" className="gap-2 w-full sm:w-auto">
-                    Get Early Access
+                    Start Free Trial
                     <ArrowRight className="w-5 h-5" />
                   </Button>
                 </Link>
-                <a href="#how-it-works">
-                  <Button variant="hero-outline" size="xl" className="w-full sm:w-auto">
-                    See How It Works
-                  </Button>
-                </a>
+                <Button variant="hero-outline" size="xl" className="w-full sm:w-auto">
+                  Watch Demo
+                </Button>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-6 justify-center lg:justify-start text-sm text-muted-foreground">
+                {benefits.map((benefit, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <benefit.icon className="w-4 h-4 text-accent" />
+                    {benefit.text}
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -235,7 +147,7 @@ export default function LandingPage() {
               <div className="relative rounded-2xl overflow-hidden shadow-xl">
                 <img
                   src={heroImage}
-                  alt="Blueprint Hub dashboard preview showing live budget, schedule, and design decisions"
+                  alt="BlueprintHub Dashboard Preview"
                   className="w-full h-auto"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
@@ -249,8 +161,8 @@ export default function LandingPage() {
                       <CheckCircle2 className="w-5 h-5 text-success" />
                     </div>
                     <div>
-                      <p className="font-display text-2xl text-foreground">+$4,200</p>
-                      <p className="text-sm text-muted-foreground">Quartz upgrade · no delay</p>
+                      <p className="text-2xl font-bold text-foreground">2,500+</p>
+                      <p className="text-sm text-muted-foreground">Projects Completed</p>
                     </div>
                   </div>
                 </CardContent>
@@ -260,43 +172,16 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Problem Statement */}
-      <section className="py-20 lg:py-28 bg-card border-y border-border">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-14 animate-fade-in-up">
-            <h2 className="font-display text-3xl sm:text-4xl text-foreground mb-4">
-              Home renovations shouldn't feel like chaos.
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              The tools you've been using were built for office work — not for building a home.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {painPoints.map((p, i) => (
-              <Card key={i} className="border-border hover-lift">
-                <CardContent className="p-7">
-                  <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center mb-4">
-                    <AlertTriangle className="w-5 h-5 text-destructive" />
-                  </div>
-                  <h3 className="font-display text-xl text-foreground mb-2">{p.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{p.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Features Section */}
       <section id="features" className="py-20 lg:py-32 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="font-display text-3xl sm:text-4xl text-foreground mb-4">
-              What Blueprint Hub{" "}
-              <span className="text-gradient-accent">Does</span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+              Everything You Need to{" "}
+              <span className="text-gradient-accent">Succeed</span>
             </h2>
             <p className="text-lg text-muted-foreground">
-              Six AI-powered systems that translate design decisions into real-world cost, time, and scope.
+              From initial plans to final handover, BlueprintHub keeps your projects on track and your clients happy.
             </p>
           </div>
 
@@ -310,148 +195,16 @@ export default function LandingPage() {
                   <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-colors">
                     <feature.icon className="w-6 h-6 text-accent" />
                   </div>
-                  <h3 className="font-display text-xl text-foreground mb-2">
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
+                  <p className="text-muted-foreground">
                     {feature.description}
                   </p>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section id="how-it-works" className="py-20 lg:py-28 relative overflow-hidden">
-        <div className="absolute inset-0 blueprint-grid-subtle opacity-40 pointer-events-none" />
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="font-display text-3xl sm:text-4xl text-foreground mb-4">
-              How It <span className="text-gradient-accent">Works</span>
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              From first inspiration photo to a finished home, in three connected steps.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {steps.map((s) => (
-              <Card key={s.n} className="border-border hover-lift bg-card">
-                <CardContent className="p-7">
-                  <div className="font-display text-3xl text-accent mb-3">{s.n}</div>
-                  <h3 className="font-display text-xl text-foreground mb-3 leading-snug">{s.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{s.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Who It's For */}
-      <section id="who-its-for" className="py-20 lg:py-28 bg-card border-y border-border">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="font-display text-3xl sm:text-4xl text-foreground mb-4">
-              Who It's <span className="text-gradient-accent">For</span>
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              One platform, three views — purpose-built for everyone at the table.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {audiences.map((a) => (
-              <Card key={a.title} className="border-border hover-lift">
-                <CardContent className="p-7">
-                  <div className="text-3xl mb-3" aria-hidden>{a.emoji}</div>
-                  <h3 className="font-display text-xl text-foreground mb-2">{a.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{a.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Additional Features Grid */}
-      <section className="py-20 lg:py-28">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-14">
-            <h2 className="font-display text-3xl sm:text-4xl text-foreground mb-4">
-              And a deep bench of <span className="text-gradient-accent">AI assistants</span>
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Smaller tools that quietly remove friction from every week of the project.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {additionalFeatures.map((f) => (
-              <Card key={f.title} className="border-border hover-lift">
-                <CardContent className="p-5 flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                    <f.icon className="w-5 h-5 text-accent" />
-                  </div>
-                  <p className="text-sm font-medium text-foreground leading-snug">{f.title}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20 lg:py-28 bg-muted/30 border-y border-border">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-14">
-            <h2 className="font-display text-3xl sm:text-4xl text-foreground mb-4">
-              Trusted by <span className="text-gradient-accent">homeowners and pros</span>
-            </h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((t) => (
-              <Card key={t.name} className="border-border hover-lift bg-card">
-                <CardContent className="p-7">
-                  <p className="text-foreground leading-relaxed mb-6 italic">"{t.quote}"</p>
-                  <div className="border-t border-border pt-4">
-                    <p className="font-semibold text-foreground">{t.name}</p>
-                    <p className="text-sm text-muted-foreground">{t.role}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Early Access CTA */}
-      <section className="py-20 lg:py-28 relative overflow-hidden">
-        <div className="absolute inset-0 blueprint-grid opacity-30 pointer-events-none" />
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <Card className="max-w-3xl mx-auto border-accent/30 bg-card shadow-xl">
-            <CardContent className="p-10 text-center">
-              <h2 className="font-display text-3xl sm:text-4xl text-foreground mb-3">
-                Be First to <span className="text-gradient-accent">Build Smarter.</span>
-              </h2>
-              <p className="text-muted-foreground mb-8">
-                Limited beta spots — launching 2025.
-              </p>
-              <form
-                onSubmit={(e) => e.preventDefault()}
-                className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto"
-              >
-                <input
-                  type="email"
-                  required
-                  placeholder="you@yourhome.com"
-                  className="flex-1 h-12 rounded-lg border border-input bg-background px-4 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-                <Button type="submit" variant="hero" size="lg">
-                  Join the Waitlist
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
         </div>
       </section>
 

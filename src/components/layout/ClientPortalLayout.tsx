@@ -13,11 +13,6 @@ import {
   X,
   HardHat,
   User,
-  Calendar,
-  FileSignature,
-  ClipboardCheck,
-  Newspaper,
-  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -34,16 +29,11 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Overview", href: "/portal" },
-  { icon: Calendar, label: "Schedule", href: "/portal/schedule" },
-  { icon: Newspaper, label: "Daily Updates", href: "/portal/updates" },
-  { icon: ClipboardCheck, label: "Approvals", href: "/portal/selections" },
   { icon: FolderOpen, label: "Documents", href: "/portal/documents" },
-  { icon: FileSignature, label: "Contracts", href: "/portal/contracts" },
   { icon: CheckSquare, label: "Checklist", href: "/portal/checklist" },
   { icon: MessageSquare, label: "Messages", href: "/portal/messages" },
   { icon: Receipt, label: "Invoices", href: "/portal/invoices" },
   { icon: Camera, label: "Upload Photos", href: "/portal/photos" },
-  { icon: BookOpen, label: "Home Manual", href: "/portal/manual" },
 ];
 
 export function ClientPortalLayout() {
