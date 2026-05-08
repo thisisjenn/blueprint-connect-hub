@@ -245,6 +245,42 @@ export type Database = {
         }
         Relationships: []
       }
+      project_daily_updates: {
+        Row: {
+          created_at: string
+          id: string
+          photo_url: string | null
+          posted_by: string | null
+          project_id: string
+          summary: string | null
+          title: string
+          update_date: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          photo_url?: string | null
+          posted_by?: string | null
+          project_id: string
+          summary?: string | null
+          title: string
+          update_date?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          photo_url?: string | null
+          posted_by?: string | null
+          project_id?: string
+          summary?: string | null
+          title?: string
+          update_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       project_files: {
         Row: {
           category: string | null
@@ -330,6 +366,51 @@ export type Database = {
           },
         ]
       }
+      project_selections: {
+        Row: {
+          client_notes: string | null
+          created_at: string
+          decided_at: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          image_url: string | null
+          option_name: string | null
+          project_id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          client_notes?: string | null
+          created_at?: string
+          decided_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          image_url?: string | null
+          option_name?: string | null
+          project_id: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          client_notes?: string | null
+          created_at?: string
+          decided_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          image_url?: string | null
+          option_name?: string | null
+          project_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       project_tasks: {
         Row: {
           completed_at: string | null
@@ -379,6 +460,7 @@ export type Database = {
           address: string | null
           client_id: string | null
           client_record_id: string | null
+          contractor_id: string | null
           created_at: string | null
           description: string | null
           end_date: string | null
@@ -392,6 +474,7 @@ export type Database = {
           address?: string | null
           client_id?: string | null
           client_record_id?: string | null
+          contractor_id?: string | null
           created_at?: string | null
           description?: string | null
           end_date?: string | null
@@ -405,6 +488,7 @@ export type Database = {
           address?: string | null
           client_id?: string | null
           client_record_id?: string | null
+          contractor_id?: string | null
           created_at?: string | null
           description?: string | null
           end_date?: string | null
@@ -461,9 +545,10 @@ export type Database = {
       is_client_for_project: { Args: { _project_id: string }; Returns: boolean }
       is_contractor: { Args: never; Returns: boolean }
       is_project_member: { Args: { _project_id: string }; Returns: boolean }
+      owns_project: { Args: { _project_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "client" | "contractor"
+      app_role: "client" | "contractor" | "designer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -591,7 +676,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["client", "contractor"],
+      app_role: ["client", "contractor", "designer"],
     },
   },
 } as const
