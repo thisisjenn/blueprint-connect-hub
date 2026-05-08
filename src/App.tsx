@@ -63,7 +63,7 @@ function RoleBasedRedirect() {
     return <Navigate to="/portal" replace />;
   }
 
-  if (role === "contractor") {
+  if (role === "contractor" || role === "designer") {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -93,7 +93,7 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPasswordPage />} />
 
               {/* Contractor Dashboard (protected) */}
-              <Route element={<ProtectedRoute allowedRoles={["contractor"]} />}>
+              <Route element={<ProtectedRoute allowedRoles={["contractor", "designer"]} />}>
                 <Route path="/dashboard" element={<DashboardLayout />}>
                   <Route index element={<DashboardHome />} />
                   <Route path="jobs" element={<JobsPage />} />
