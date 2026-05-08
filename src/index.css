@@ -9,73 +9,73 @@
 
 @layer base {
   :root {
-    /* Core Blueprint Colors */
-    --background: 210 20% 98%;
-    --foreground: 222 47% 11%;
+    /* Core Blueprint Hub Colors (warm off-white + deep navy) */
+    --background: 42 27% 95%;     /* #F7F5F0 */
+    --foreground: 210 35% 17%;    /* #1C2B3A */
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 210 35% 17%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 210 35% 17%;
 
-    /* Primary: Deep Navy Blue (Blueprint theme) */
-    --primary: 222 47% 20%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary: Deep Navy */
+    --primary: 210 35% 17%;
+    --primary-foreground: 42 27% 97%;
 
-    /* Secondary: Slate Gray */
-    --secondary: 215 25% 27%;
-    --secondary-foreground: 210 40% 98%;
+    /* Secondary: Warm Grey */
+    --secondary: 220 9% 46%;      /* #6B7280 */
+    --secondary-foreground: 0 0% 100%;
 
     /* Muted: Soft blue-gray */
-    --muted: 214 32% 91%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 42 18% 90%;
+    --muted-foreground: 220 9% 40%;
 
-    /* Accent: Warm Amber (CTAs, highlights) */
-    --accent: 38 92% 50%;
-    --accent-foreground: 222 47% 11%;
+    /* Accent: Brass Gold */
+    --accent: 40 55% 50%;          /* #C49A3C */
+    --accent-foreground: 0 0% 100%;
 
     /* Destructive */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%;      /* #DC2626 */
+    --destructive-foreground: 0 0% 100%;
 
     /* UI Elements */
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 222 47% 20%;
+    --border: 42 18% 86%;
+    --input: 42 18% 86%;
+    --ring: 40 55% 50%;
     --radius: 0.625rem;
 
     /* Sidebar */
-    --sidebar-background: 222 47% 11%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 38 92% 50%;
-    --sidebar-primary-foreground: 222 47% 11%;
-    --sidebar-accent: 222 47% 18%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 222 30% 20%;
-    --sidebar-ring: 38 92% 50%;
+    --sidebar-background: 210 35% 14%;
+    --sidebar-foreground: 42 27% 95%;
+    --sidebar-primary: 40 55% 50%;
+    --sidebar-primary-foreground: 210 35% 14%;
+    --sidebar-accent: 210 35% 20%;
+    --sidebar-accent-foreground: 42 27% 95%;
+    --sidebar-border: 210 30% 22%;
+    --sidebar-ring: 40 55% 50%;
 
     /* Custom BlueprintHub tokens */
-    --blueprint-grid: 214 32% 85%;
-    --blueprint-line: 222 47% 30%;
-    --success: 142 71% 45%;
+    --blueprint-grid: 210 25% 78%;
+    --blueprint-line: 210 35% 25%;
+    --success: 142 71% 38%;        /* #16A34A */
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 222 47% 11%;
+    --warning: 40 55% 50%;
+    --warning-foreground: 0 0% 100%;
     --info: 199 89% 48%;
     --info-foreground: 0 0% 100%;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(222 47% 20%) 0%, hsl(222 47% 11%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(38 92% 50%) 0%, hsl(25 95% 53%) 100%);
-    --gradient-hero: linear-gradient(180deg, hsl(210 20% 98%) 0%, hsl(214 32% 95%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(210 35% 17%) 0%, hsl(210 35% 11%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(40 55% 55%) 0%, hsl(36 60% 45%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(42 27% 96%) 0%, hsl(42 22% 92%) 100%);
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(222 47% 11% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(222 47% 11% / 0.1), 0 2px 4px -1px hsl(222 47% 11% / 0.06);
-    --shadow-lg: 0 10px 15px -3px hsl(222 47% 11% / 0.1), 0 4px 6px -2px hsl(222 47% 11% / 0.05);
-    --shadow-xl: 0 20px 25px -5px hsl(222 47% 11% / 0.1), 0 10px 10px -5px hsl(222 47% 11% / 0.04);
-    --shadow-accent: 0 4px 14px 0 hsl(38 92% 50% / 0.35);
+    --shadow-sm: 0 1px 2px 0 hsl(210 35% 17% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(210 35% 17% / 0.08), 0 2px 4px -1px hsl(210 35% 17% / 0.05);
+    --shadow-lg: 0 10px 20px -5px hsl(210 35% 17% / 0.10), 0 4px 8px -2px hsl(210 35% 17% / 0.05);
+    --shadow-xl: 0 24px 40px -8px hsl(210 35% 17% / 0.15);
+    --shadow-accent: 0 6px 18px 0 hsl(40 55% 50% / 0.30);
   }
 
   .dark {
@@ -137,6 +137,11 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  h1, h2, h3, .font-display {
+    font-family: '"DM Serif Display"', Georgia, serif;
+    letter-spacing: -0.01em;
+  }
+
   /* Blueprint grid pattern for backgrounds */
   .blueprint-grid {
     background-image: 
@@ -151,6 +156,20 @@
       linear-gradient(hsl(var(--blueprint-grid) / 0.5) 1px, transparent 1px),
       linear-gradient(90deg, hsl(var(--blueprint-grid) / 0.5) 1px, transparent 1px);
     background-size: 40px 40px;
+  }
+
+  /* Architectural thin line accent (top + bottom hairlines) */
+  .architectural-rule {
+    position: relative;
+  }
+  .architectural-rule::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(var(--blueprint-line) / 0.3), transparent);
   }
 }
 
