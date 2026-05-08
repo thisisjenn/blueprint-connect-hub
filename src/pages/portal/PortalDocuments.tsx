@@ -33,6 +33,7 @@ import {
 import { format } from "date-fns";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { openProjectFile } from "@/lib/storage";
 
 interface ProjectFile {
   id: string;
@@ -95,15 +96,11 @@ export default function PortalDocuments() {
         .upload(filePath, uploadFile);
       if (storageError) throw storageError;
 
-      const { data: urlData } = supabase.storage
-        .from("project-files")
-        .getPublicUrl(filePath);
-
       const fileType = uploadFile.type.startsWith("image/") ? "image" : "document";
 
       const { error: dbError } = await supabase.from("project_files").insert({
         name: uploadFile.name,
-        file_url: urlData.publicUrl,
+        file_url: filePath,
         file_type: fileType,
         file_size: uploadFile.size,
         project_id: uploadProjectId,
@@ -202,15 +199,11 @@ export default function PortalDocuments() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">{file.file_type}</Badge>
-                    <Button variant="ghost" size="icon-sm" asChild>
-                      <a href={file.file_url} target="_blank" rel="noopener noreferrer">
-                        <Eye className="w-4 h-4" />
-                      </a>
+                    <Button variant="ghost" size="icon-sm" onClick={() => openProjectFile(file.file_url)}>
+                      <Eye className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon-sm" asChild>
-                      <a href={file.file_url} download>
-                        <Download className="w-4 h-4" />
-                      </a>
+                    <Button variant="ghost" size="icon-sm" onClick={() => openProjectFile(file.file_url, true)}>
+                      <Download className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>

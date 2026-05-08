@@ -48,6 +48,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { openProjectFile } from "@/lib/storage";
 
 export default function DocumentsPage() {
   const { user } = useAuth();
@@ -102,10 +103,6 @@ export default function DocumentsPage() {
         .upload(filePath, uploadFile);
       if (storageError) throw storageError;
 
-      const { data: urlData } = supabase.storage
-        .from("project-files")
-        .getPublicUrl(filePath);
-
       const fileType = uploadFile.type.startsWith("image/")
         ? "image"
         : uploadFile.type.includes("pdf")
@@ -114,7 +111,8 @@ export default function DocumentsPage() {
 
       const { error: dbError } = await supabase.from("project_files").insert({
         name: uploadFile.name,
-        file_url: urlData.publicUrl,
+        // Store the storage path only — generate signed URLs at view time.
+        file_url: filePath,
         file_type: fileType,
         file_size: uploadFile.size,
         project_id: uploadProjectId,
@@ -299,11 +297,9 @@ export default function DocumentsPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <a href={file.file_url} target="_blank" rel="noopener noreferrer">
-                            <Download className="w-4 h-4 mr-2" />
-                            Download
-                          </a>
+                        <DropdownMenuItem onClick={() => openProjectFile(file.file_url, true)}>
+                          <Download className="w-4 h-4 mr-2" />
+                          Download
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => toggleShareMutation.mutate({ id: file.id, shared: !file.is_shared_with_client })}>
                           <Share2 className="w-4 h-4 mr-2" />
@@ -359,11 +355,9 @@ export default function DocumentsPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <a href={file.file_url} target="_blank" rel="noopener noreferrer">
-                            <Download className="w-4 h-4 mr-2" />
-                            Download
-                          </a>
+                        <DropdownMenuItem onClick={() => openProjectFile(file.file_url, true)}>
+                          <Download className="w-4 h-4 mr-2" />
+                          Download
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => toggleShareMutation.mutate({ id: file.id, shared: !file.is_shared_with_client })}>
                           <Share2 className="w-4 h-4 mr-2" />
