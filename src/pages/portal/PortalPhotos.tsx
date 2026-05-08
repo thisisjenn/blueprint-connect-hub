@@ -399,6 +399,23 @@ export default function PortalPhotos() {
       </div>
 
       {/* Photos Grid */}
+      {(() => {
+        const beforePhoto = [...photos].reverse().find((p) => p.category === "before");
+        const afterPhoto = [...photos].reverse().find((p) => p.category === "after");
+        if (!beforePhoto || !afterPhoto) return null;
+        const beforeUrl = signedUrls[beforePhoto.id];
+        const afterUrl = signedUrls[afterPhoto.id];
+        if (!beforeUrl || !afterUrl) return null;
+        return (
+          <Card>
+            <CardHeader><CardTitle>Before & After</CardTitle></CardHeader>
+            <CardContent>
+              <BeforeAfterSlider beforeUrl={beforeUrl} afterUrl={afterUrl} />
+            </CardContent>
+          </Card>
+        );
+      })()}
+
       {photos.length === 0 ? (
         <Card>
           <CardContent className="p-12 text-center">
