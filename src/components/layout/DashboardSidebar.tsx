@@ -13,6 +13,8 @@ import {
   ChevronRight,
   LogOut,
   HardHat,
+  Newspaper,
+  ClipboardCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -25,6 +27,8 @@ const navItems = [
   { icon: FolderOpen, label: "Documents", href: "/dashboard/documents" },
   { icon: MessageSquare, label: "Messages", href: "/dashboard/messages" },
   { icon: Calendar, label: "Schedule", href: "/dashboard/schedule" },
+  { icon: Newspaper, label: "Daily Updates", href: "/dashboard/updates" },
+  { icon: ClipboardCheck, label: "Selections", href: "/dashboard/selections" },
   { icon: FileText, label: "Contracts", href: "/dashboard/contracts" },
 ];
 
